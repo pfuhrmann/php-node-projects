@@ -1,0 +1,26 @@
+{
+    "name": "comp1687/cw",
+    "description": "Web Application Coursework",
+    "require": {
+        "phroute/phroute": "1.*",
+        "twig/twig": "~1.0",
+        "gregwar/captcha": "~1.0",
+        "gregwar/image": "~2.0",
+        "respect/validation": "~0.6",
+        "ircmaxell/password-compat": "~1.0",
+        "kilte/pagination": "~1.1"
+},
+    "license": "private",
+    "authors": [
+        {
+            "name": "Patrik Fuhrmann",
+            "email": "fuhrmann.patrik@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "COMP1687\\CW\\": "app/",
+            "Respect\\Validation\\": "validation/"
+        }
+    }
+}

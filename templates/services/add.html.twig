@@ -1,0 +1,80 @@
+{% extends "base.html.twig" %}
+
+{% block title %}Add New Post{% endblock %}
+
+{% block content %}
+    <div class="row clearfix">
+        <div class="col-md-10 column">
+            <h1>Add New Post</h1>
+
+            <div class="jumbotron">
+                {# JS errors #}
+                <div class="alert alert-danger hidden" id="errors"></div>
+
+                {# PHP errors #}
+                {% autoescape false %}
+                {% if not errorsAll is empty %}
+                    <div class="alert alert-danger">
+                        <ul>
+                            {% for errors in errorsAll %}
+                                {% for error in errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+                {% endautoescape %}
+
+                {# Service form #}
+                <form class="form-horizontal" method="post" action="index.php?uri=add-service">
+                    <div class="form-group">
+                        <label for="business" class="col-sm-2 control-label">Business Name</label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" id="business" name="business" value="{{ input.business }}" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="postcode" class="col-sm-2 control-label">Postcode</label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" id="postcode" name="postcode" value="{{ input.postcode }}" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="type" class="col-sm-2 control-label">Sitting Type</label>
+                        <div class="col-sm-9">
+                            <select class="form-control" name="type" id="type">
+                                <option value="Sitter" {% if input.type == 'Sitter' %}selected="selected"{% endif %}>Sitter</option>
+                                <option value="Babysitter" {% if input.type == 'Babysitter' %}selected="selected"{% endif %}>Babysitter</option>
+                                <option value="Petsitter" {% if input.type == 'Petsitter' %}selected="selected"{% endif %}>Petsitter</option>
+                                <option value="Housesitter" {% if input.type == 'Housesitter' %}selected="selected"{% endif %}>Housesitter</option>
+                                <option value="Plantsitter" {% if input.type == 'Plantsitter' %}selected="selected"{% endif %}>Plantsitter</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="details" class="col-sm-2 control-label">Service Details</label>
+                        <div class="col-sm-9">
+                            <textarea class="form-control" name="details" id="details" rows="15" cols="80">{{ input.details }}</textarea>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-offset-2 col-sm-10">
+                            <p><button type="submit" class="btn btn-success" id="submit">Add Post</button></p>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascript %}
+    <script type="text/javascript">
+        // Validate form
+        var checkRun = false;
+        $("#submit").on("click", function(event) {
+            validate(event, 'validate-post');
+        });
+    </script>
+{% endblock %}
