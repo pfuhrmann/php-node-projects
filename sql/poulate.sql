@@ -1,4 +1,4 @@
-USE comp1688;
+USE mdb_fp202;
 
 -- Truncate database
 SET foreign_key_checks = 0;
@@ -15,7 +15,7 @@ VALUES
 	('FirstName3' ,'LastName3', 'test1@gmail.com', '+44745454'),
 	('FirstName4' ,'LastName4', 'test1@gmail.com', '+44745454'),
 	('FirstName5' ,'LastName5', 'test1@gmail.com', '+44745454');
-
+ 
 INSERT INTO service
  (sitter_id, type, location, availability, description, charges)
 VALUES
