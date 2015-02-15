@@ -2,7 +2,7 @@
 
 namespace COMP1688\CW\Controllers;
 
-use \Twig_Environment;
+use Twig_Environment;
 
 class TestController {
 
