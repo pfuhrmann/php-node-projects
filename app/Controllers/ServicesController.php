@@ -6,9 +6,8 @@ use COMP1688\CW\DatabaseManager;
 use DOMDocument;
 use PDO;
 
-
 /**
- * Sitters service
+ * Sitters Web Service (REST XML)
  */
 class ServicesController
 {
@@ -17,6 +16,9 @@ class ServicesController
      */
     private $db;
 
+    /**
+     * Create new instance of ServicesController
+     */
     public function __construct()
     {
         $this->db = DatabaseManager::getInstance();
@@ -24,10 +26,11 @@ class ServicesController
 
     /**
      * Return valid, well-formed XML of all sitter accounts
-     * - HTTP GET /sitters
+     *  GET /sitters?type=string  HTTP/1.1
+     *  POST /sitters type=string  HTTP/1.1
      * @returns string
      */
-    public function getSitters()
+    public function anySitters()
     {
         header('Content-type: text/xml');
         // Prepare DOM document
@@ -93,10 +96,11 @@ class ServicesController
 
     /**
      * Return valid, well-formed XML for one sitter matched by ID
-     * - HTTP GET /sitter-details
+     *  GET /sitter-details?id=int  HTTP/1.1
+     *  POST /sitter-details id=int  HTTP/1.1
      * @returns string
      */
-    public function getSitterDetail()
+    public function anySitterDetail()
     {
         header('Content-type: text/xml');
         // Prepare DOM document
