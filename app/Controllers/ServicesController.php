@@ -17,11 +17,12 @@ class ServicesController
     private $db;
 
     /**
-     * Create new instance of ServicesController
+     * Create new instance of Services Controller
+     * @param PDO $db
      */
-    public function __construct()
+    public function __construct(PDO $db)
     {
-        $this->db = DatabaseManager::getInstance();
+        $this->db = $db;
     }
 
     /**
@@ -40,9 +41,9 @@ class ServicesController
 
         // Retrieve sitters
         $params = [];
-        if (!empty($_GET['type'])) {
+        if (!empty($_REQUEST['type'])) {
             // Get sitter accounts by type
-            $sitterType = $_GET['type'];
+            $sitterType = $_REQUEST['type'];
             $query = 'SELECT si.* FROM sitter si INNER JOIN service se ON si.id = se.sitter_id WHERE se.type LIKE ? GROUP BY si.id';
             $params[] = '%'.$sitterType.'%';
         } else {
@@ -109,23 +110,29 @@ class ServicesController
         $xmlRoot = $xmlDom->documentElement;
 
         // Validation of ID param
-        if (!isset($_GET['id']) || empty($_GET['id'])) {
+        if (!isset($_REQUEST['id']) || empty($_REQUEST['id'])) {
             $xmlError = $xmlDom->createElement('error_message', 'ID parameter not provided');
             $xmlRoot->appendChild($xmlError);
             return $xmlDom->saveXML();
-        } else if (!is_numeric($_GET['id'])) {
+        } else if (!is_numeric($_REQUEST['id'])) {
             $xmlError = $xmlDom->createElement('error_message', 'ID parameter must be numeric');
             $xmlRoot->appendChild($xmlError);
             return $xmlDom->saveXML();
         }
 
         // Retrieve sitters
-        $sitterId = $_GET['id'];
-        $query = 'SELECT * FROM sitter WHERE id = :id';
+        $sitterId = $_REQUEST['id'];
+        $query = 'SELECT * FROM sitter WHERE id = :id LIMIT 1';
         $stmt = $this->db->prepare($query);
         $stmt->bindParam(':id', $sitterId, PDO::PARAM_INT);
         $stmt->execute();
         $sitter = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$sitter) {
+            $xmlError = $xmlDom->createElement('error_message', 'Record with provided ID does not exist');
+            $xmlRoot->appendChild($xmlError);
+            return $xmlDom->saveXML();
+        }
 
         // ID
         $xmlId = $xmlDom->CreateAttribute('id');
@@ -193,5 +200,10 @@ class ServicesController
         }
 
         return $xmlDom->saveXML();
+    }
+
+    private function getParam($param)
+    {
+
     }
 }
