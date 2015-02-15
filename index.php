@@ -12,7 +12,7 @@ $twig->addExtension(new Twig_Extension_Debug());
 
 // Router bootstrap
 $router = new Phroute\RouteCollector();
-$router->controller('/', new COMP1687\CW\Controllers\ServicesController($twig));
+$router->controller('/', new COMP1688\CW\Controllers\ServicesController($twig));
 $dispatcher = new Phroute\Dispatcher($router);
 
 // This is hack for stuweb web server

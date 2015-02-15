@@ -1,6 +1,6 @@
 {
-    "name": "comp1687/cw",
-    "description": "Web Application Coursework",
+    "name": "comp1688/cw",
+    "description": "Service-Oriented Applications",
     "require": {
         "phroute/phroute": "1.*",
         "twig/twig": "~1.0",
@@ -16,7 +16,7 @@
     ],
     "autoload": {
         "psr-4": {
-            "COMP1687\\CW\\": "app/",
+            "COMP1688\\CW\\": "app/",
             "Respect\\Validation\\": "validation/"
         }
     }
