@@ -1,7 +1,4 @@
 <?php
-
-session_start();
-
 // Composer bootstrap
 require 'vendor/autoload.php';
 
