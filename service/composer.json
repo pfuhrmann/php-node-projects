@@ -1,0 +1,21 @@
+{
+    "name": "comp1688/cw-service",
+    "description": "Service-Oriented Applications",
+    "require": {
+        "phroute/phroute": "1.*",
+        "twig/twig": "~1.0"
+},
+    "license": "private",
+    "authors": [
+        {
+            "name": "Patrik Fuhrmann",
+            "email": "fuhrmann.patrik@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "COMP1688\\CW\\": "app/",
+            "Respect\\Validation\\": "validation/"
+        }
+    }
+}

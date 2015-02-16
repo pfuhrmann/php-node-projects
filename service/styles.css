@@ -1,0 +1,39 @@
+body {
+    font-size: 16px;
+}
+
+.push-top {
+    padding-top: 4px;
+}
+
+.push-bottom {
+    padding-top: 10px;
+}
+
+.push-top {
+    padding-bottom: 20px;
+}
+
+.red {
+    color: darkred;
+}
+
+.tall {
+    height: 137px;
+}
+
+.table>tbody>tr>td {
+    vertical-align: middle;
+}
+
+@media (min-width: 768px) {
+    .navbar-right {
+        margin-right: 0;
+    }
+}
+
+@media (max-width: 768px) {
+    .navbar-right {
+        margin-left: 10px;
+    }
+}

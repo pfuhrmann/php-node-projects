@@ -1,6 +1,6 @@
 {
-    "name": "comp1688/cw",
-    "description": "Service-Oriented Applications",
+    "name": "comp1688/cw-portal",
+    "description": "Sitters Search Portal Variations",
     "require": {
         "phroute/phroute": "1.*",
         "twig/twig": "~1.0"
