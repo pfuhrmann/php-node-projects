@@ -27,7 +27,7 @@ class SearchPortalController extends BaseUIController {
         $xmlDom1 = new DOMDocument();
         $xmlDom1->loadXML($xmls, LIBXML_NOBLANKS);
 
-        $url = 'http://comp1688.app/index.php?uri=sitters&type='.$type;
+        $url = 'http://comp1688-service.app/index.php?uri=sitters&type='.$type;
         $xmlDom2 = new DOMDocument();
         $xmlDom2->load($url);
 

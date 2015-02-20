@@ -16,12 +16,12 @@ class TestSearchController extends BaseUIController {
 
     /**
      * Test Sitters service
-     *  GET /test-sitters  HTTP/1.1
+     *  GET /test-search-xml  HTTP/1.1
      * @returns string
      */
-    public function getTestSitters()
+    public function getTestSearchXml()
     {
-        return $this->render('tests/sitters.html', []);
+        return $this->render('tests/search-xml.html', []);
     }
 
     /**
