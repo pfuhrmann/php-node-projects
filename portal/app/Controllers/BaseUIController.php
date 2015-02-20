@@ -22,8 +22,9 @@ class BaseUIController {
     /**
      * Render Twig template
      *
-     * @param string $template
-     * @param array  $options
+     * @param string $template Template path
+     * @param array  $options  Option delivered to template
+     * @return string
      */
     protected function render($template, array $options)
     {

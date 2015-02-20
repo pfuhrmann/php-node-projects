@@ -15,7 +15,7 @@ class TestSearchController extends BaseUIController {
     }
 
     /**
-     * Test Sitters service
+     * Test merged search results (Level 4)
      *  GET /test-search-xml  HTTP/1.1
      * @returns string
      */
@@ -25,12 +25,12 @@ class TestSearchController extends BaseUIController {
     }
 
     /**
-     * Test SittersDetails service
-     *  GET /test-sitter-details  HTTP/1.1
+     * Test graphical merged search results (Level 5)
+     *  GET /test-search-display  HTTP/1.1
      * @returns string
      */
-    public function getTestSitterDetail()
+    public function getTestSearchDisplay()
     {
-        return $this->render('tests/sitter_detail.html', []);
+        return $this->render('tests/search-display.html', []);
     }
 }

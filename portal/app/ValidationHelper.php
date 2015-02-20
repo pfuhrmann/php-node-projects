@@ -1,6 +1,6 @@
 <?php
 
-namespace COMP1687\CW;
+namespace COMP1688\CW;
 
 use COMP1687\CW\DatabaseManager;
 use PDO;
