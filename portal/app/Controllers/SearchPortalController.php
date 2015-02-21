@@ -2,9 +2,10 @@
 
 namespace COMP1688\CW\Controllers;
 
+use LSS\Array2XML;
+use COMP1688\CW\EnvironmentHelper as Env;
 use DOMDocument;
 use SoapClient;
-use COMP1688\CW\EnvironmentHelper as Env;
 
 class SearchPortalController extends BaseUIController {
 
@@ -23,7 +24,10 @@ class SearchPortalController extends BaseUIController {
         }
 
         $xmlDom = $this->loadMergedResults([
-            'type' => $type
+            'type' => $type,
+            'sort' => 'pricedesc',
+            'limit' => '',
+            'page' => '',
         ]);
 
         return $xmlDom->saveXML();
@@ -58,15 +62,15 @@ class SearchPortalController extends BaseUIController {
     private function loadMergedResults(array $query)
     {
         // Get results from .NET service (Lewisham)
-        $client = new SoapClient('http://comp1688.azurewebsites.net/SittersService.asmx?WSDL');
-        $xmls = $client->sitters($query)->SittersResult->any;
+        $client = new SoapClient('http://stuiis.cms.gre.ac.uk/fp202/comp1688/SittersService.asmx?WSDL');
+        $xmls = $client->sitters(['type' => $query['type']])->SittersResult->any;
         $xmlDom1 = new DOMDocument();
         $xmlDom1->loadXML($xmls, LIBXML_NOBLANKS);
 
         // Get results from PHP service (Greenwich)
         $env = Env::getInstance();
         $serverName = ($env->isDev()) ? 'comp1688-service.app' : 'stuweb.cms.gre.ac.uk/~fp202';
-        $url = 'http://'.$serverName.'/index.php?uri=sitters&type='.$query['type'];
+        $url = 'http://'.$serverName.'/index.php?uri=sitters&type='.$query['type'].'';
         $xmlDom2 = new DOMDocument();
         $xmlDom2->load($url);
 
@@ -77,7 +81,97 @@ class SearchPortalController extends BaseUIController {
             $xmlRoot1->appendChild($node1);
         }
 
+        // Convert xml to array
+        $xml = simplexml_load_string($xmlDom1->saveXML());
+        $json = json_encode($xml);
+        $sitters = json_decode($json, TRUE)['sitter'];
+
+        // Sorting
+        $className = 'COMP1688\\CW\\Controllers\\SearchPortalController';
+        switch ($query['sort']) {
+            case 'priceasc':
+                usort($sitters, [$className, 'sortByChargesAsc']);
+                break;
+            case 'pricedesc':
+                usort($sitters, [$className, 'sortByChargesDesc']);
+                break;
+            case 'location':
+                usort($sitters, [$className, 'sortByLocation']);
+                break;
+            default:
+                usort($sitters, [$className, 'sortByChargesAsc']);
+        }
+
+        // Pagination
+        if (!empty($query['limit'])) {
+            // Limit
+            if (!is_int($query['limit'])) {
+                // TODO: Error return XML error message
+            }
+            $limit = $query['limit'];
+            // Page
+            $page = 1;
+            if (!empty($query['page'])) {
+                if (!is_int($query['page'])) {
+                    // TODO: Error return XML error message
+                }
+                $page = $query['page'];
+            }
+
+            $sitters = array_slice($sitters, $limit*($page-1), $limit);
+        }
+
+        // Convert array back to XML
+        $sittersTop = [];
+        if (!empty($sitters)) {
+            $sittersTop['sitter'] = $sitters;
+        }
+        $xmlDom = Array2XML::createXML('sitters', $sittersTop);
+
         //return $xmlDom1->saveXML();
-        return $xmlDom1;
+        return $xmlDom;
+    }
+
+    /**
+     * Sort sitters array by charges (ascending)
+     * @param $sitterA
+     * @param $sitterB
+     * @return bool
+     * @noinspection PhpUnusedPrivateMethodInspection
+     */
+    private function sortByChargesAsc($sitterA, $sitterB) {
+        if ($sitterA['service']['charges'] === $sitterB['service']['charges']) {
+            return 0;
+        }
+
+        return ($sitterA['service']['charges'] < $sitterB['service']['charges']) ? -1 : 1;
+    }
+
+    /**
+     * Sort sitters array by charges (descending)
+     * @param $sitterA
+     * @param $sitterB
+     * @return bool
+     */
+    private function sortByChargesDesc($sitterA, $sitterB) {
+        if ($sitterA['service']['charges'] === $sitterB['service']['charges']) {
+            return 0;
+        }
+
+        return ($sitterA['service']['charges'] > $sitterB['service']['charges']) ? -1 : 1;
+    }
+
+    /**
+     * Sort sitters array by location (A to Z)
+     * @param $sitterA
+     * @param $sitterB
+     * @return bool
+     */
+    private function sortByLocation($sitterA, $sitterB) {
+        if ($sitterA['service']['location'] === $sitterB['service']['location']) {
+            return 0;
+        }
+
+        return ($sitterA['service']['location'] < $sitterB['service']['location']) ? -1 : 1;
     }
 }

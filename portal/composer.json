@@ -2,6 +2,7 @@
     "name": "comp1688/cw-portal",
     "description": "Sitters Search Portal Variations",
     "require": {
+        "openlss/lib-array2xml": "0.*",
         "phroute/phroute": "1.*",
         "twig/twig": "~1.0"
 },

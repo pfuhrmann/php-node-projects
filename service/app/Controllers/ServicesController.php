@@ -33,6 +33,7 @@ class ServicesController
     public function anySitters()
     {
         header('Content-type: text/xml');
+
         // Prepare DOM document
         $xmlDom = new DOMDocument();
         $xmlDom->appendChild($xmlDom->createElement('sitters'));
@@ -44,51 +45,48 @@ class ServicesController
             if (!empty($_REQUEST['type'])) {
                 // Get sitter accounts by type
                 $sitterType = $_REQUEST['type'];
-                $query = 'SELECT si.* FROM sitter si INNER JOIN service se ON si.id = se.sitter_id WHERE se.type LIKE ? GROUP BY si.id';
+                $query = 'SELECT * FROM service se INNER JOIN sitter si ON si.id = se.sitter_id WHERE se.type LIKE ?';
                 $params[] = '%'.$sitterType.'%';
             } else {
                 // Get all sitter accounts
-                $query = 'SELECT * FROM sitter si';
+                $query = 'SELECT * FROM service se INNER JOIN sitter si ON si.id = se.sitter_id';
             }
-            $stmtSi = $this->db->prepare($query);
-            $stmtSi->execute($params);
+            $stmtSe = $this->db->prepare($query);
+            $stmtSe->execute($params);
 
-            while ($sitter = $stmtSi->fetch(PDO::FETCH_ASSOC)) {
+            while ($service = $stmtSe->fetch(PDO::FETCH_ASSOC)) {
                 $xmlSitter = $xmlDom->createElement('sitter');
                 // ID
                 $xmlId = $xmlDom->CreateAttribute('id');
-                $xmlId->value = $sitter['id'];
+                $xmlId->value = $service['id'];
                 $xmlSitter->appendChild($xmlId);
                 // Name
                 $xmlName = $xmlDom->createElement('name');
                 $xmlSitter->appendChild($xmlName);
                 // First Name
-                $xmlFname = $xmlDom->createElement('firstname', $sitter['first_name']);
+                $xmlFname = $xmlDom->createElement('firstname', $service['first_name']);
                 $xmlName->appendChild($xmlFname);
                 // Last Name
-                $xmlLname = $xmlDom->createElement('lastname', $sitter['last_name']);
+                $xmlLname = $xmlDom->createElement('lastname', $service['last_name']);
                 $xmlName->appendChild($xmlLname);
                 // Email
-                $xmlEmail = $xmlDom->createElement('email', $sitter['email']);
+                $xmlEmail = $xmlDom->createElement('email', $service['email']);
                 $xmlSitter->appendChild($xmlEmail);
                 // Phone
-                $xmlPhone = $xmlDom->createElement('phone', $sitter['phone']);
+                $xmlPhone = $xmlDom->createElement('phone', $service['phone']);
                 $xmlSitter->appendChild($xmlPhone);
-                // Services
-                $xmlServices = $xmlDom->createElement('services');
-                $xmlSitter->appendChild($xmlServices);
-
-                // Retrieve services
-                $query = 'SELECT * FROM service WHERE sitter_id = :sitterId';
-                $stmtSe = $this->db->prepare($query);
-                $stmtSe->bindParam(':sitterId', $sitter['id'], PDO::PARAM_INT);
-                $stmtSe->execute();
-
-                while ($service = $stmtSe->fetch(PDO::FETCH_ASSOC)) {
-                    // Service type
-                    $xmlStype = $xmlDom->createElement('service_type', $service['type']);
-                    $xmlServices->appendChild($xmlStype);
-                }
+                // Service
+                $xmlService = $xmlDom->createElement('service');
+                $xmlSitter->appendChild($xmlService);
+                // Service type
+                $xmlStype = $xmlDom->createElement('type', $service['type']);
+                $xmlService->appendChild($xmlStype);
+                // Service charges
+                $xmlScharges = $xmlDom->createElement('charges', $service['charges']);
+                $xmlService->appendChild($xmlScharges);
+                // Service location
+                $xmlSloc = $xmlDom->createElement('location', $service['location']);
+                $xmlService->appendChild($xmlSloc);
 
                 $xmlRoot->appendChild($xmlSitter);
             }

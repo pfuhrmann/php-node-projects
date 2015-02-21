@@ -32,7 +32,9 @@
                         <thead>
                         <tr>
                             <th id="name">Name</th>
-                            <th id="sittertype">Services</th>
+                            <th id="type">Type</th>
+                            <th id="charges">Charges</th>
+                            <th id="location">Location</th>
                             <th id="details">Details</th>
                         </tr>
                         </thead>
@@ -40,7 +42,9 @@
                         {% for post in posts %}
                             <tr class="tall">
                                 <td headers="name" class="center">{{ post.business }}</td>
-                                <td headers="sittertype" class="center">{{ post.type }}</td>
+                                <td headers="type" class="center">{{ post.type }}</td>
+                                <td headers="charges" class="center">{{ post.charges }}</td>
+                                <td headers="location" class="center">{{ post.location }}</td>
                                 <td headers="details" class="center">
                                     <a href="index.php?uri=service-details&#38;id={{ post.id }}" title="View service details" class="btn btn-sm btn-info">Details</a>
                                 </td>
