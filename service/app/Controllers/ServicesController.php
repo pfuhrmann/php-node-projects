@@ -69,12 +69,6 @@ class ServicesController
                 // Last Name
                 $xmlLname = $xmlDom->createElement('lastname', $service['last_name']);
                 $xmlName->appendChild($xmlLname);
-                // Email
-                $xmlEmail = $xmlDom->createElement('email', $service['email']);
-                $xmlSitter->appendChild($xmlEmail);
-                // Phone
-                $xmlPhone = $xmlDom->createElement('phone', $service['phone']);
-                $xmlSitter->appendChild($xmlPhone);
                 // Service
                 $xmlService = $xmlDom->createElement('service');
                 $xmlSitter->appendChild($xmlService);

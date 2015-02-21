@@ -5,6 +5,7 @@ namespace COMP1688\CW\Controllers;
 use LSS\Array2XML;
 use COMP1688\CW\EnvironmentHelper as Env;
 use DOMDocument;
+use LSS\XML2Array;
 use SoapClient;
 
 class SearchPortalController extends BaseUIController {
@@ -18,21 +19,15 @@ class SearchPortalController extends BaseUIController {
     {
         header('Content-type: text/xml');
 
-        $type = '';
-        if (isset($_REQUEST['type'])) {
-            $type = $_REQUEST['type'];
-        }
-
         $xmlDom = $this->loadMergedResults([
-            'type' => $type,
-            'sort' => 'pricedesc',
-            'limit' => '',
-            'page' => '',
+            'type' => isset($_REQUEST['type']) ? $_REQUEST['type'] : '',
+            'sort' => isset($_REQUEST['sort']) ? $_REQUEST['sort'] : '',
+            'limit' => isset($_REQUEST['limit']) ? $_REQUEST['limit'] : '',
+            'page' => isset($_REQUEST['page']) ? $_REQUEST['page'] : '',
         ]);
 
         return $xmlDom->saveXML();
     }
-
 
     /**
      * Test graphical merged search results (Level 5)
@@ -61,14 +56,18 @@ class SearchPortalController extends BaseUIController {
      */
     private function loadMergedResults(array $query)
     {
+        $env = Env::getInstance();
+
         // Get results from .NET service (Lewisham)
-        $client = new SoapClient('http://stuiis.cms.gre.ac.uk/fp202/comp1688/SittersService.asmx?WSDL');
+        $wsdl = ($env->isDev()) ?
+            'http://comp1688.azurewebsites.net/SittersService.asmx?WSDL' :
+            'http://stuiis.cms.gre.ac.uk/fp202/comp1688/SittersService.asmx?WSDL';
+        $client = new SoapClient($wsdl);
         $xmls = $client->sitters(['type' => $query['type']])->SittersResult->any;
         $xmlDom1 = new DOMDocument();
         $xmlDom1->loadXML($xmls, LIBXML_NOBLANKS);
 
         // Get results from PHP service (Greenwich)
-        $env = Env::getInstance();
         $serverName = ($env->isDev()) ? 'comp1688-service.app' : 'stuweb.cms.gre.ac.uk/~fp202';
         $url = 'http://'.$serverName.'/index.php?uri=sitters&type='.$query['type'].'';
         $xmlDom2 = new DOMDocument();
@@ -82,53 +81,59 @@ class SearchPortalController extends BaseUIController {
         }
 
         // Convert xml to array
-        $xml = simplexml_load_string($xmlDom1->saveXML());
-        $json = json_encode($xml);
-        $sitters = json_decode($json, TRUE)['sitter'];
+        $sitters = XML2Array::createArray($xmlDom1->saveXML());
+        if (!empty($sitters['sitters'])) {
+            $sitters = $sitters['sitters']['sitter'];
 
-        // Sorting
-        $className = 'COMP1688\\CW\\Controllers\\SearchPortalController';
-        switch ($query['sort']) {
-            case 'priceasc':
-                usort($sitters, [$className, 'sortByChargesAsc']);
-                break;
-            case 'pricedesc':
-                usort($sitters, [$className, 'sortByChargesDesc']);
-                break;
-            case 'location':
-                usort($sitters, [$className, 'sortByLocation']);
-                break;
-            default:
-                usort($sitters, [$className, 'sortByChargesAsc']);
-        }
-
-        // Pagination
-        if (!empty($query['limit'])) {
-            // Limit
-            if (!is_int($query['limit'])) {
-                // TODO: Error return XML error message
+            // Sorting
+            $className = 'COMP1688\\CW\\Controllers\\SearchPortalController';
+            switch ($query['sort']) {
+                case 'priceasc':
+                    usort($sitters, [$className, 'sortByChargesAsc']);
+                    break;
+                case 'pricedesc':
+                    usort($sitters, [$className, 'sortByChargesDesc']);
+                    break;
+                case 'location':
+                    usort($sitters, [$className, 'sortByLocation']);
+                    break;
+                default:
+                    usort($sitters, [$className, 'sortByChargesAsc']);
             }
-            $limit = $query['limit'];
-            // Page
-            $page = 1;
-            if (!empty($query['page'])) {
-                if (!is_int($query['page'])) {
+
+            // Pagination
+            if (!empty($query['limit'])) {
+                // Limit
+                if (!is_int($query['limit'])) {
                     // TODO: Error return XML error message
                 }
-                $page = $query['page'];
+                $limit = $query['limit'];
+                // Page
+                $page = 1;
+                if (!empty($query['page'])) {
+                    if (!is_int($query['page'])) {
+                        // TODO: Error return XML error message
+                    }
+                    $page = $query['page'];
+                }
+
+                $sitters = array_slice($sitters, $limit*($page-1), $limit);
             }
 
-            $sitters = array_slice($sitters, $limit*($page-1), $limit);
+            // Convert array back to XML
+            $sittersTop = [];
+            if (!empty($sitters)) {
+                $sittersTop['sitter'] = $sitters;
+            }
+            $xmlDom = Array2XML::createXML('sitters', $sittersTop);
+
+            return $xmlDom;
         }
 
-        // Convert array back to XML
-        $sittersTop = [];
-        if (!empty($sitters)) {
-            $sittersTop['sitter'] = $sitters;
-        }
-        $xmlDom = Array2XML::createXML('sitters', $sittersTop);
+        // Empty result
+        $sitters = [];
+        $xmlDom = Array2XML::createXML('sitters', $sitters);
 
-        //return $xmlDom1->saveXML();
         return $xmlDom;
     }
 

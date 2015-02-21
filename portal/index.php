@@ -1,6 +1,6 @@
 <?php
 // Disable WSDL cache
-ini_set( "soap.wsdl_cache_enabled", 0 );
+ini_set("soap.wsdl_cache_enabled", WSDL_CACHE_NONE);
 
 // Composer bootstrap
 require 'vendor/autoload.php';
