@@ -23,14 +23,4 @@ class TestSearchController extends BaseUIController {
     {
         return $this->render('tests/search-xml.html', []);
     }
-
-    /**
-     * Test graphical merged search results (Level 5)
-     *  GET /test-search-display  HTTP/1.1
-     * @returns string
-     */
-    public function getTestSearchDisplay()
-    {
-        return $this->render('tests/search-display.html', []);
-    }
 }

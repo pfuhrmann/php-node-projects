@@ -1,0 +1,60 @@
+{% extends "base.html.twig" %}
+
+{% block content %}
+<div class="row clearfix">
+    <div class="col-md-10 column">
+        <form class="form-inline" method="post" action="index.php?uri=search-display-results">
+            <h1>Search Sitters</h1>
+
+            <div class="jumbotron">
+                {# PHP errors #}
+                {% autoescape false %}
+                {% if not errorsAll is empty %}
+                    <div class="alert alert-danger">
+                        <ul>
+                            {% for errors in errorsAll %}
+                                {% for error in errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+                {% endautoescape %}
+
+                <p class="push-top">Please select search filters</p>
+
+                {# Search by sitter type #}
+                <div class="row push-top">
+                    <div class="form-group">
+                        <label for="type" class="col-sm-5 control-label push-bottom">Sitter Type</label>
+                        <div class="col-sm-5 push-bottom">
+                            <input type="text" class="form-control" id="type" name="type" value="{{ input.type }}" size="14" placeholder="grannysitter" />
+                        </div>
+                    </div>
+                </div>
+
+                {# Search by postcode #}
+                <div class="row">
+                    <div class="form-group">
+                        <label for="sort" class="col-sm-5 control-label push-bottom">Sort By</label>
+                        <div class="col-sm-5 push-bottom">
+                            <select class="form-control" name="sort" id="sort">
+                                <option value="priceasc">Price: Low to High</option>
+                                <option value="pricedesc">Price: High to Low</option>
+                                <option value="location">Location: A to Z</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-2 push-bottom">
+                        <button type="submit" class="btn btn-primary">Search Now</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
