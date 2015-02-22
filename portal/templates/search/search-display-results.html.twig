@@ -6,13 +6,57 @@
 <div class="row clearfix">
     <div class="col-md-10 column">
         <div class="jumbotron">
-            <h2>Search Results</h2>
-            <strong>Criteria:</strong>
-            {% if input.searchType == 'type' %}Type = {{ input.type }}{% endif %}
-            {% if input.searchType == 'postcode' %}Postcode = {{ input.postcode }}{% endif %}
+            <div class="row ">
+                <h2>Search Results</h2>
+                <a href="index.php?uri=search-display" class="btn btn-primary">Back To Search</a>
+            </div>
 
-            {% if not posts is empty %}
+            <div class="row push-bottom">
+                <h3>Filters:</h3>
+                {% if input.type != '' %}<strong>Type</strong> = {{ input.type }} | {% endif %}
+                <strong>Sort By</strong> = {{ input.sort }}
+            </div>
+
+            {% if not sitters is empty %}
                 <hr />
+            <div class="row push-bottom">
+                {# Display pagination #}
+                {% if not pages is empty %}
+                    <strong>Pages:</strong>
+                {% endif %}
+                {% for key, page in pages %}
+                    {% if currentPage == key %}
+                        {{ key }}
+                    {% else %}
+                        <a href="index.php?uri=search-display-results&#38;type={{ input.type }}&#38;sort={{ input.sort }}&#38;page={{ key }}">{{ key }}</a>
+                    {% endif %}
+                    {% if not loop.last %},{% endif %}
+                {% endfor %}
+
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th id="name">Name</th>
+                        <th id="type">Type</th>
+                        <th id="charges">Charges (p/h)</th>
+                        <th id="location">Location</th>
+                        <th id="details">Details</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for sitter in sitters %}
+                        <tr class="tall">
+                            <td headers="name" class="center">{{ sitter.name.firstname }} {{ sitter.name.lastname }}</td>
+                            <td headers="type" class="center">{{ sitter.service.type }}</td>
+                            <td headers="charges" class="center">&pound;{{ sitter.service.charges }}</td>
+                            <td headers="location" class="center">{{ sitter.service.location }}</td>
+                            <td headers="details" class="center">
+                                <a href="index.php?uri=sitter-details&#38;id={{ attribute(sitter, '@attributes').id }}&#38;service={{ attribute(sitter, '@attributes').service }}" title="View sitters details" class="btn btn-sm btn-info">Details</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
 
                 {# Display pagination #}
                 {% if not pages is empty %}
@@ -22,55 +66,16 @@
                     {% if currentPage == key %}
                         {{ key }}
                     {% else %}
-                        <a href="index.php?uri=search&#38;page={{ key }}">{{ key }}</a>
+                        <a href="index.php?uri=search-display-results&#38;type={{ input.type }}&#38;sort={{ input.sort }}&#38;page={{ key }}">{{ key }}</a>
                     {% endif %}
                     {% if not loop.last %},{% endif %}
                 {% endfor %}
-
-                <div class="row push-bottom">
-                    <table class="table">
-                        <thead>
-                        <tr>
-                            <th id="name">Name</th>
-                            <th id="type">Type</th>
-                            <th id="charges">Charges</th>
-                            <th id="location">Location</th>
-                            <th id="details">Details</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {% for post in posts %}
-                            <tr class="tall">
-                                <td headers="name" class="center">{{ post.business }}</td>
-                                <td headers="type" class="center">{{ post.type }}</td>
-                                <td headers="charges" class="center">{{ post.charges }}</td>
-                                <td headers="location" class="center">{{ post.location }}</td>
-                                <td headers="details" class="center">
-                                    <a href="index.php?uri=service-details&#38;id={{ post.id }}" title="View service details" class="btn btn-sm btn-info">Details</a>
-                                </td>
-                            </tr>
-                        {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
+            </div>
             {% else %}
                 <div class="clearfix push-bottom">
                     <p class="red"><strong>No results found, please try different search filters.</strong></p>
                 </div>
             {% endif %}
-
-            {# Display pagination #}
-            {% if not pages is empty %}
-                <strong>Pages:</strong>
-            {% endif %}
-            {% for key, page in pages %}
-                {% if currentPage == key %}
-                    {{ key }}
-                {% else %}
-                    <a href="index.php?uri=search&#38;page={{ key }}">{{ key }}</a>
-                {% endif %}
-                {% if not loop.last %},{% endif %}
-            {% endfor %}
         </div>
     </div>
 </div>

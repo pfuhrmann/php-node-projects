@@ -4,8 +4,55 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "9ed495495db7888d314078ea71baad6a",
+    "hash": "f1e5b333038cabba36e0e45ddbe02847",
     "packages": [
+        {
+            "name": "kilte/pagination",
+            "version": "1.1.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Kilte/pagination.git",
+                "reference": "586570e646002c8dcc02a52d338d3dcb450e3a0f"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Kilte/pagination/zipball/586570e646002c8dcc02a52d338d3dcb450e3a0f",
+                "reference": "586570e646002c8dcc02a52d338d3dcb450e3a0f",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "@stable"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.1.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Kilte\\Pagination\\": "source"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Kilte Leichnam",
+                    "email": "nwotnbm@gmail.com"
+                }
+            ],
+            "description": "Simple pagination",
+            "keywords": [
+                "pagination"
+            ],
+            "time": "2014-12-27 20:03:06"
+        },
         {
             "name": "openlss/lib-array2xml",
             "version": "0.0.9",
