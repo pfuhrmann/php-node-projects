@@ -42,15 +42,16 @@ class ServicesController
         try {
             // Retrieve sitters
             $params = [];
+            $query = 'SELECT se.id, se.type, se.charges, se.location, si.first_name, si.first_name, si.last_name
+                      FROM service se
+                      INNER JOIN sitter si ON si.id = se.sitter_id';
             if (!empty($_REQUEST['type'])) {
                 // Get sitter accounts by type
                 $sitterType = $_REQUEST['type'];
-                $query = 'SELECT * FROM service se INNER JOIN sitter si ON si.id = se.sitter_id WHERE se.type LIKE ?';
+                $query .= ' WHERE se.type LIKE ?';
                 $params[] = '%'.$sitterType.'%';
-            } else {
-                // Get all sitter accounts
-                $query = 'SELECT * FROM service se INNER JOIN sitter si ON si.id = se.sitter_id';
             }
+
             $stmtSe = $this->db->prepare($query);
             $stmtSe->execute($params);
 
@@ -60,6 +61,10 @@ class ServicesController
                 $xmlId = $xmlDom->CreateAttribute('id');
                 $xmlId->value = $service['id'];
                 $xmlSitter->appendChild($xmlId);
+                // Service
+                $xmlServ = $xmlDom->CreateAttribute('service');
+                $xmlServ->value = 'greenwich';
+                $xmlSitter->appendChild($xmlServ);
                 // Name
                 $xmlName = $xmlDom->createElement('name');
                 $xmlSitter->appendChild($xmlName);
@@ -121,7 +126,11 @@ class ServicesController
 
             // Retrieve sitters
             $sitterId = $_REQUEST['id'];
-            $query = 'SELECT * FROM sitter WHERE id = :id LIMIT 1';
+            $query = 'SELECT se.id, se.type, se.location, se.availability, se.description, se.charges, si.first_name, si.last_name, si.email, si.phone
+                      FROM service se
+                      INNER JOIN sitter si ON se.sitter_id = si.id
+                      WHERE se.id = :id
+                      LIMIT 1';
             $stmt = $this->db->prepare($query);
             $stmt->bindParam(':id', $sitterId, PDO::PARAM_INT);
             $stmt->execute();
@@ -152,50 +161,42 @@ class ServicesController
             // Phone
             $xmlPhone = $xmlDom->createElement('phone', $sitter['phone']);
             $xmlRoot->appendChild($xmlPhone);
+
             // Services
-            $xmlServ = $xmlDom->createElement('services');
+            $xmlServ = $xmlDom->createElement('service');
             $xmlRoot->appendChild($xmlServ);
+            // Type
+            $xmlStype = $xmlDom->createElement('type', $sitter['type']);
+            $xmlServ->appendChild($xmlStype);
+            // Location
+            $xmlLoc = $xmlDom->createElement('location', $sitter['location']);
+            $xmlServ->appendChild($xmlLoc);
+            // Availability
+            $xmlAvail = $xmlDom->createElement('availability', $sitter['availability']);
+            $xmlServ->appendChild($xmlAvail);
+            // Description
+            $xmlDesc = $xmlDom->createElement('description', $sitter['description']);
+            $xmlServ->appendChild($xmlDesc);
+            // Charges
+            $xmlCharg = $xmlDom->createElement('charges', $sitter['charges']);
+            $xmlServ->appendChild($xmlCharg);
+            // Images
+            $xmlImg = $xmlDom->createElement('images');
+            $xmlServ->appendChild($xmlImg);
 
-            // Retrieve services
-            $query = 'SELECT * FROM service WHERE sitter_id = :sitterId';
-            $stmtSe = $this->db->prepare($query);
-            $stmtSe->bindParam(':sitterId', $sitter['id'], PDO::PARAM_INT);
-            $stmtSe->execute();
+            // Retrieve images
+            $query = 'SELECT * FROM image WHERE service_id = :serviceId';
+            $stmtImg = $this->db->prepare($query);
+            $stmtImg->bindParam(':serviceId', $sitter['id'], PDO::PARAM_INT);
+            $stmtImg->execute();
 
-            while ($service = $stmtSe->fetch(PDO::FETCH_ASSOC)) {
-                // Service
-                $xmlService = $xmlDom->createElement('service');
-                $xmlServ->appendChild($xmlService);
-                // Type
-                $xmlStype = $xmlDom->createElement('type', $service['type']);
-                $xmlService->appendChild($xmlStype);
-                // Location
-                $xmlLoc = $xmlDom->createElement('location', $service['location']);
-                $xmlService->appendChild($xmlLoc);
-                // Availability
-                $xmlAvail = $xmlDom->createElement('availability', $service['availability']);
-                $xmlService->appendChild($xmlAvail);
-                // Description
-                $xmlDesc = $xmlDom->createElement('description', $service['description']);
-                $xmlService->appendChild($xmlDesc);
-                // Charges
-                $xmlCharg = $xmlDom->createElement('charges', $service['charges']);
-                $xmlService->appendChild($xmlCharg);
-                // Images
-                $xmlImg = $xmlDom->createElement('images');
-                $xmlService->appendChild($xmlImg);
-
-                // Retrieve images
-                $query = 'SELECT * FROM image WHERE service_id = :serviceId';
-                $stmtImg = $this->db->prepare($query);
-                $stmtImg->bindParam(':serviceId', $service['id'], PDO::PARAM_INT);
-                $stmtImg->execute();
-
-                while ($image = $stmtImg->fetch(PDO::FETCH_ASSOC)) {
-                    // URL
-                    $xmlImgUrl = $xmlDom->createElement('image_url', $image['code']);
-                    $xmlImg->appendChild($xmlImgUrl);
-                }
+            while ($image = $stmtImg->fetch(PDO::FETCH_ASSOC)) {
+                // Image
+                $xmlImage = $xmlDom->createElement('image');
+                $xmlImg->appendChild($xmlImage);
+                // URL
+                $xmlImgUrl = $xmlDom->createElement('image_url', $image['code']);
+                $xmlImage->appendChild($xmlImgUrl);
             }
 
             return $xmlDom->saveXML();

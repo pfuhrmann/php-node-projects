@@ -1,0 +1,103 @@
+{% extends "base.html.twig" %}
+
+{% block content %}
+<div class="row clearfix">
+    <div class="col-md-10 column">
+        <h1>Sitter Details</h1>
+
+        {# Info #}
+        <div class="jumbotron">
+            <h2>Information</h2>
+
+            <div class="row push-bottom">
+                <div class="col-sm-2">
+                    <strong>Full Name:</strong>
+                </div>
+                <div class="col-sm-7">
+                    {{ sitter.name.firstname }} {{ sitter.name.lastname }}
+                </div>
+            </div>
+
+            <div class="row push-bottom">
+                <div class="col-sm-2">
+                    <strong>Type:</strong>
+                </div>
+                <div class="col-sm-7">
+                    {{ sitter.service.type }}
+                </div>
+            </div>
+
+            <div class="row push-bottom">
+                <div class="col-sm-2">
+                    <strong>Email:</strong>
+                </div>
+                <div class="col-sm-7">
+                    {{ sitter.email }}
+                </div>
+            </div>
+
+            <div class="row push-bottom">
+                <div class="col-sm-2">
+                    <strong>Phone:</strong>
+                </div>
+                <div class="col-sm-7">
+                    {{ sitter.phone }}
+                </div>
+            </div>
+
+            <div class="row push-bottom">
+                <div class="col-sm-2">
+                    <strong>Charges:</strong>
+                </div>
+                <div class="col-sm-7">
+                    &pound;{{ sitter.service.charges }} p/h
+                </div>
+            </div>
+
+            <div class="row push-bottom">
+                <div class="col-sm-2">
+                    <strong>Location:</strong>
+                </div>
+                <div class="col-sm-7">
+                    {{ sitter.service.location }}
+                </div>
+            </div>
+
+            <div class="row push-bottom">
+                <div class="col-sm-2">
+                    <strong>Availability:</strong>
+                </div>
+                <div class="col-sm-7">
+                    {{ sitter.service.availability }}
+                </div>
+            </div>
+
+            <div class="row push-bottom">
+                <div class="col-sm-2">
+                    <strong>Description:</strong>
+                </div>
+                <div class="col-sm-7">
+                    {% autoescape false %}
+                    {{ sitter.service.description }}
+                    {% endautoescape %}
+                </div>
+            </div>
+        </div>
+
+        {# Sitter's images #}
+        {% if not sitter.service.images is empty %}
+            <div class="jumbotron">
+                <h2>Pictures</h2>
+
+                <div class="row push-bottom">
+                    {% for image in sitter.service.images.image %}
+                        <div class="col-sm-4 push-bottom push-top">
+                            <img src="{{ image.image_url }}" widhth="200" height="200" />
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

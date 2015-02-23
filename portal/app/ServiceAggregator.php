@@ -31,13 +31,14 @@ class ServiceAggregator {
     private $query;
 
     /**
-     * Service aggregator factory
+     * Service aggregator factory (list of sitters)
      * @param array $query Query arguments used in service calls
      * @return ServiceAggregator
      */
     public static function createAggregator(array $query)
     {
-        return new ServiceAggregator($query);
+        $aggr = new ServiceAggregator($query);
+        return $aggr;
     }
 
     /**
@@ -48,22 +49,16 @@ class ServiceAggregator {
         $this->query = $query;
     }
 
-    public function fetchResults()
+    public function fetchResultsSitters()
     {
-        $env = Env::getInstance();
-
         // Get results from .NET service (Lewisham)
-        $wsdl = ($env->isDev()) ?
-            'http://comp1688.azurewebsites.net/SittersService.asmx?WSDL' :
-            'http://stuiis.cms.gre.ac.uk/fp202/comp1688/SittersService.asmx?WSDL';
-        $client = new SoapClient($wsdl);
+        $client = new SoapClient($this->getServiceUrl('lewisham'));
         $xmls = $client->sitters(['type' => $this->query['type']])->SittersResult->any;
         $xmlDom1 = new DOMDocument();
         $xmlDom1->loadXML($xmls, LIBXML_NOBLANKS);
 
         // Get results from PHP service (Greenwich)
-        $serverName = ($env->isDev()) ? 'comp1688-service.app' : 'stuweb.cms.gre.ac.uk/~fp202';
-        $url = 'http://'.$serverName.'/index.php?uri=sitters&type='.$this->query['type'].'';
+        $url = $this->getServiceUrl('greenwich').'/index.php?uri=sitters&type='.$this->query['type'].'';
         $xmlDom2 = new DOMDocument();
         $xmlDom2->load($url);
 
@@ -101,15 +96,15 @@ class ServiceAggregator {
             if (!empty($this->query['limit'])) {
                 // Limit
                 if (!ctype_digit($this->query['limit'])) {
-                    $this->errorMessage = 'Limit parameter must be numeric';
-                    return false;
-                }
+                    $this->errorMessage = 'Limit parameter must be positive whole number';
+                return false;
+            }
                 $limit = $this->query['limit'];
                 // Page
                 $page = 1;
                 if (!empty($this->query['page'])) {
                     if (!ctype_digit($this->query['page'])) {
-                        $this->errorMessage = 'Page parameter must be numeric';
+                        $this->errorMessage = 'Page parameter must be positive whole number';
                         return false;
                     }
                     $page = $this->query['page'];
@@ -131,6 +126,56 @@ class ServiceAggregator {
         // Empty result
         $this->results = Array2XML::createXML('sitters', []);
         return true;
+    }
+
+    public function fetchResultsSitterDetails()
+    {
+        switch ($this->query['service']) {
+            case 'lewisham':
+                // Get results from .NET service (Lewisham)
+                $client = new SoapClient($this->getServiceUrl('lewisham'));
+                $xmls = $client->sitterDetails(['id' => $this->query['id']])->SitterDetailsResult->any;
+                $xmlDom = new DOMDocument();
+                $xmlDom->loadXML($xmls, LIBXML_NOBLANKS);
+                $this->results = $xmlDom;
+
+                return true;
+            case 'greenwich':
+                // Get results from PHP service (Greenwich)
+                $url = $this->getServiceUrl('greenwich').'/index.php?uri=sitter-detail&id='.$this->query['id'].'';
+                $xmlDom = new DOMDocument();
+                $xmlDom->load($url);
+                $this->results = $xmlDom;
+
+                return true;
+            case 'broomley':
+                // TODO: Broomley we service in Node.js
+                break;
+        }
+    }
+
+    /**
+     * Returns URL of the service based on location
+     * @param $name
+     * @return string
+     */
+    public function getServiceUrl($name) {
+        $env = Env::getInstance();
+
+        switch ($name) {
+            case 'lewisham':
+                $url = ($env->isDev()) ?
+                    'http://comp1688.azurewebsites.net/SittersService.asmx?WSDL' :
+                    'http://stuiis.cms.gre.ac.uk/fp202/comp1688/SittersService.asmx?WSDL';
+                return $url;
+            case 'greenwich':
+                $serverName = ($env->isDev()) ? 'comp1688-service.app' : 'stuweb.cms.gre.ac.uk/~fp202';
+                $url = 'http://'.$serverName;
+                return $url;
+            case 'broomley':
+                // TODO: Broomley we service in Node.js
+                break;
+        }
     }
 
     /**

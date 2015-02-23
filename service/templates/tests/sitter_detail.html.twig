@@ -1,33 +1,33 @@
 {% extends "base.html.twig" %}
 
 {% block content %}
-    <div class="row clearfix">
-        <div class="col-md-10 column">
-            <p>Click <strong><a href="./">here</a></strong> for a complete list of operations.</p>
+<div class="row clearfix">
+    <div class="col-md-10 column">
+        <p>Click <strong><a href="./">here</a></strong> for a complete list of operations.</p>
 
-            <h1>SitterDetail</h1>
+        <h1>SitterDetail</h1>
 
-            <p>To test the operation using the HTTP POST protocol, click the 'Invoke' button.</p>
-            <form method="POST" action="index.php?uri=sitter-detail" target="_blank">
-                <table class="table">
-                    <thead>
-                    <tr>
-                        <td><strong>Parameter</strong></td>
-                        <td><strong>Value</strong></td>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr>
-                        <td>Id:</td>
-                        <td><input name="id" type="text" size="40" class="form-control" /></td>
-                    </tr>
-                    <tr>
-                        <td></td>
-                        <td><input type="submit" value="Invoke" class="btn btn-primary" /></td>
-                    </tr>
-                    </tbody>
-                </table>
-            </form>
-        </div>
+        <p>To test the operation using the HTTP POST protocol, click the 'Invoke' button.</p>
+        <form method="POST" action="index.php?uri=sitter-detail" target="_blank">
+            <table class="table">
+            <thead>
+                <tr>
+                    <td><strong>Parameter</strong></td>
+                    <td><strong>Value</strong></td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Id:</td>
+                    <td><input name="id" type="text" size="40" class="form-control" /></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td><input type="submit" value="Invoke" class="btn btn-primary" /></td>
+                </tr>
+            </tbody>
+            </table>
+        </form>
     </div>
+</div>
 {% endblock %}

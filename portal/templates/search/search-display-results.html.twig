@@ -51,7 +51,7 @@
                             <td headers="charges" class="center">&pound;{{ sitter.service.charges }}</td>
                             <td headers="location" class="center">{{ sitter.service.location }}</td>
                             <td headers="details" class="center">
-                                <a href="index.php?uri=sitter-details&#38;id={{ attribute(sitter, '@attributes').id }}&#38;service={{ attribute(sitter, '@attributes').service }}" title="View sitters details" class="btn btn-sm btn-info">Details</a>
+                                <a href="index.php?uri=sitter-detail&#38;id={{ attribute(sitter, '@attributes').id }}&#38;service={{ attribute(sitter, '@attributes').service }}" title="View sitters details" class="btn btn-sm btn-info">Details</a>
                             </td>
                         </tr>
                     {% endfor %}

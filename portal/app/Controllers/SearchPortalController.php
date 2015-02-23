@@ -2,15 +2,16 @@
 
 namespace COMP1688\CW\Controllers;
 
+use COMP1688\CW\ServiceAggregator;
 use DOMDocument;
 use Kilte\Pagination\Pagination;
+use LSS\Array2XML;
 use LSS\XML2Array;
-use COMP1688\CW\ServiceAggregator;
 
 class SearchPortalController extends BaseUIController {
 
     /**
-     * Search from services and return XML
+     * Search from services and return XML (Level 4)
      *  GET /search-xml  HTTP/1.1
      * @returns string
      */
@@ -18,10 +19,14 @@ class SearchPortalController extends BaseUIController {
     {
         header('Content-type: text/xml');
 
-        $query = $this->parseRequest($_REQUEST);
-        $xmlDom = $this->loadMergedResults($query);
+        $query = $this->parseRequestSitters($_REQUEST);
+        $aggr = ServiceAggregator::createAggregator($query);
+        if (!$aggr->fetchResultsSitters()) {
+            $error = $aggr->getErrorMessage();
+            return $this->createErrorDoc($error)->saveXML();
+        }
 
-        return $xmlDom->saveXML();
+        return $aggr->getResults()->saveXML();
     }
 
     /**
@@ -43,20 +48,24 @@ class SearchPortalController extends BaseUIController {
     {
         // Get sitters
         $input = $_GET;
-        $query = $this->parseRequest($input);
-        $query['limit'] = '2'; // Hard setting limit to 10
+        $query = $this->parseRequestSitters($input);
+        $query['limit'] = '5'; // Hard setting limit to 10
         $aggr = ServiceAggregator::createAggregator($query);
-        $aggr->fetchResults();
+        $aggr->fetchResultsSitters();
         $sitters = XML2Array::createArray($aggr->getResults()->saveXML());
         $sitters = !empty($sitters['sitters']) ? $sitters['sitters']['sitter'] : [];
 
-        // Check page param
+        // We have only 1 result
+        if (isset($sitters['name'])) {
+            $sittersA[] = $sitters;
+            $sitters = $sittersA;
+        }
+
+        // Generate pagination
         if (!ctype_digit($query['page'])) {
             $query['page'] = '1';
         }
-        // Generate pagination
         $pagination = new Pagination($aggr->getResultCount(), $query['page'], $query['limit']);
-        var_dump($aggr->getResultCount());
 
         return $this->render('search/search-display-results.html', [
             'input' => $input,
@@ -67,17 +76,51 @@ class SearchPortalController extends BaseUIController {
     }
 
     /**
+     * Test graphical merged search results (Level 5)
+     *  GET /sitter-detail  HTTP/1.1
+     * @returns string
+     */
+    public function getSitterDetail()
+    {
+        // Get sitters
+        $input = $_GET;
+        $query = $this->parseRequestSitterDetail($input);
+        $aggr = ServiceAggregator::createAggregator($query);
+        $aggr->fetchResultsSitterDetails();
+        $sitter = XML2Array::createArray($aggr->getResults()->saveXML());
+        $sitter = $sitter['sitter_detail'];
+
+        return $this->render('search/search-display-detail.html', [
+            'input' => $input,
+            'sitter' => $sitter,
+        ]);
+    }
+
+    /**
      * Parse request parameters into array suitable for
      *  passing to service
      * @param array $input
      * @return array
      */
-    private function parseRequest(array $input) {
+    private function parseRequestSitters(array $input) {
         return [
             'type' => isset($input['type']) ? $input['type'] : '',
             'sort' => isset($input['sort']) ? $input['sort'] : '',
             'limit' => isset($input['limit']) ? $input['limit'] : '',
             'page' => isset($input['page']) ? $input['page'] : '',
+        ];
+    }
+
+    /**
+     * Parse request parameters into array suitable for
+     *  passing to service
+     * @param array $input
+     * @return array
+     */
+    private function parseRequestSitterDetail(array $input) {
+        return [
+            'id' => isset($input['id']) ? $input['id'] : '',
+            'service' => isset($input['service']) ? $input['service'] : '',
         ];
     }
 
