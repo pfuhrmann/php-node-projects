@@ -21,7 +21,12 @@ class EnvironmentHelper {
      */
     private $servName;
 
-    private function __construct($servName) {
+    /**
+     * Create new instance of Environment helper
+     * @param $servName
+     */
+    private function __construct($servName)
+    {
         $this->servName = $servName;
     }
 
@@ -29,7 +34,8 @@ class EnvironmentHelper {
      * Returns true if running locally
      * @return bool
      */
-    public function isDev() {
+    public function isDev()
+    {
         return ($this->servName === $this::DEV_NAME);
     }
 
@@ -37,14 +43,16 @@ class EnvironmentHelper {
      * Returns true if running on production
      * @return bool
      */
-    public function isProd() {
+    public function isProd()
+    {
         return ($this->servName === $this::PROD_NAME);
     }
 
     /**
      * @return string
      */
-    public function getServName() {
+    public function getServName()
+    {
         return $this->getServName();
     }
 

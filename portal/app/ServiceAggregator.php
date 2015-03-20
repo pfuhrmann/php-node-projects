@@ -45,10 +45,16 @@ class ServiceAggregator {
      * Create new instance of service aggregator
      * @param array $query Query arguments used in service calls
      */
-    private function __construct(array $query) {
+    private function __construct(array $query)
+    {
         $this->query = $query;
     }
 
+    /**
+     * Fetch services for sitters list
+     * @return bool True if fetch successful
+     * @throws \Exception
+     */
     public function fetchResultsSitters()
     {
         // Get results from .NET service (Lewisham)
@@ -97,6 +103,7 @@ class ServiceAggregator {
                 // Limit
                 if (!ctype_digit($this->query['limit'])) {
                     $this->errorMessage = 'Limit parameter must be positive whole number';
+
                 return false;
             }
                 $limit = $this->query['limit'];
@@ -105,6 +112,7 @@ class ServiceAggregator {
                 if (!empty($this->query['page'])) {
                     if (!ctype_digit($this->query['page'])) {
                         $this->errorMessage = 'Page parameter must be positive whole number';
+
                         return false;
                     }
                     $page = $this->query['page'];
@@ -118,16 +126,21 @@ class ServiceAggregator {
             if (!empty($sitters)) {
                 $sittersTop['sitter'] = $sitters;
             }
-
             $this->results = Array2XML::createXML('sitters', $sittersTop);
+
             return true;
         }
 
         // Empty result
         $this->results = Array2XML::createXML('sitters', []);
+
         return true;
     }
 
+    /**
+     * Fetch services for sitter details
+     * @return bool True if fetch successful
+     */
     public function fetchResultsSitterDetails()
     {
         switch ($this->query['service']) {
@@ -167,10 +180,12 @@ class ServiceAggregator {
                 $url = ($env->isDev()) ?
                     'http://comp1688.azurewebsites.net/SittersService.asmx?WSDL' :
                     'http://stuiis.cms.gre.ac.uk/fp202/comp1688/SittersService.asmx?WSDL';
+
                 return $url;
             case 'greenwich':
                 $serverName = ($env->isDev()) ? 'comp1688-service.app' : 'stuweb.cms.gre.ac.uk/~fp202';
                 $url = 'http://'.$serverName;
+
                 return $url;
             case 'broomley':
                 // TODO: Broomley we service in Node.js
@@ -184,7 +199,8 @@ class ServiceAggregator {
      * @param $sitterB
      * @return bool
      */
-    private function sortByChargesAsc($sitterA, $sitterB) {
+    private function sortByChargesAsc($sitterA, $sitterB)
+    {
         if ($sitterA['service']['charges'] === $sitterB['service']['charges']) {
             return 0;
         }
@@ -198,7 +214,8 @@ class ServiceAggregator {
      * @param $sitterB
      * @return bool
      */
-    private function sortByChargesDesc($sitterA, $sitterB) {
+    private function sortByChargesDesc($sitterA, $sitterB)
+    {
         if ($sitterA['service']['charges'] === $sitterB['service']['charges']) {
             return 0;
         }
@@ -212,7 +229,8 @@ class ServiceAggregator {
      * @param $sitterB
      * @return bool
      */
-    private function sortByLocation($sitterA, $sitterB) {
+    private function sortByLocation($sitterA, $sitterB)
+    {
         if ($sitterA['service']['location'] === $sitterB['service']['location']) {
             return 0;
         }

@@ -29,6 +29,7 @@ abstract class BaseUIController {
     protected function render($template, array $options)
     {
         $template = $this->twig->loadTemplate($template.'.twig');
-        echo $template->render($options);
+
+        return $template->render($options);
     }
 }

@@ -7,6 +7,7 @@ use DOMDocument;
 use Kilte\Pagination\Pagination;
 use LSS\Array2XML;
 use LSS\XML2Array;
+use XSLTProcessor;
 
 class SearchPortalController extends BaseUIController {
 
@@ -97,12 +98,37 @@ class SearchPortalController extends BaseUIController {
     }
 
     /**
+     * Test graphical merged search results (Level 5)
+     *  GET /search-display-xslt  HTTP/1.1
+     * @returns string
+     */
+    public function getSearchDisplayXslt()
+    {
+        $input = $_GET;
+        $query = $this->parseRequestSitters($input);
+        $query['limit'] = '5'; // Hard setting limit to 10
+        $aggr = ServiceAggregator::createAggregator($query);
+        $aggr->fetchResultsSitters();
+        $doc = $aggr->getResults();
+        //$doc = new DOMDocument();
+        //$doc->load('goodBooks.xml',LIBXML_NOBLANKS);
+
+        $xslt = new XSLTProcessor();
+        $xsl = new DOMDocument();
+        $xsl->load('sitters.xsl', LIBXML_NOCDATA);
+        $xslt->importStylesheet($xsl);
+
+        return $xslt->transformToXML($doc);
+    }
+
+    /**
      * Parse request parameters into array suitable for
      *  passing to service
      * @param array $input
      * @return array
      */
-    private function parseRequestSitters(array $input) {
+    private function parseRequestSitters(array $input)
+    {
         return [
             'type' => isset($input['type']) ? $input['type'] : '',
             'sort' => isset($input['sort']) ? $input['sort'] : '',
@@ -117,7 +143,8 @@ class SearchPortalController extends BaseUIController {
      * @param array $input
      * @return array
      */
-    private function parseRequestSitterDetail(array $input) {
+    private function parseRequestSitterDetail(array $input)
+    {
         return [
             'id' => isset($input['id']) ? $input['id'] : '',
             'service' => isset($input['service']) ? $input['service'] : '',
@@ -129,7 +156,8 @@ class SearchPortalController extends BaseUIController {
      * @param $message
      * @return DomDocument
      */
-    private function createErrorDoc($message) {
+    private function createErrorDoc($message)
+    {
         $sitters = ['error_message' => $message];
         $xmlDom = Array2XML::createXML('sitters', $sitters);
 
