@@ -1,0 +1,12 @@
+/* humanstxt.org */
+/* The humans responsible & technology colophon */
+
+/* MAIN */
+  Develop: Patrik Fuhrmann
+  Twitter: @PatrikFuhrmann
+  Site: http://patrikfuhrmann.com
+
+/* SITE */
+  Last update: 16/05/2014
+  Doctype: HTML5, CSS3
+  IDE: SublimeText3

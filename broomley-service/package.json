@@ -1,0 +1,21 @@
+{
+  "name": "comp1688",
+  "description": "COMP1688",
+  "version": "0.0.1",
+  "private": true,
+  "author": "Patrik Fuhrmann <fuhrmann.patrik@gmail.com>",
+  "engines": {
+    "node": "0.10.x",
+    "npm": "1.4.x"
+  },
+  "dependencies": {
+    "bower": "^1.3.*",
+    "express": "^4.10.*",
+    "express-validator": "^2.7.*"
+  },
+  "devDependencies": {
+    "gulp": "^3.8.11",
+    "gulp-jshint": "^1.9.2",
+    "gulp-nodemon": "^1.0.5"
+  }
+}
