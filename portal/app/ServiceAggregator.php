@@ -16,7 +16,7 @@ class ServiceAggregator {
     private $results;
 
     /**
-     * @var int Number of resutls from most recent call
+     * @var int Number of results from most recent call
      */
     private $resultCount = 0;
 
@@ -103,16 +103,15 @@ class ServiceAggregator {
                 // Limit
                 if (!ctype_digit($this->query['limit'])) {
                     $this->errorMessage = 'Limit parameter must be positive whole number';
+                    return false;
+                }
 
-                return false;
-            }
                 $limit = $this->query['limit'];
                 // Page
                 $page = 1;
                 if (!empty($this->query['page'])) {
                     if (!ctype_digit($this->query['page'])) {
                         $this->errorMessage = 'Page parameter must be positive whole number';
-
                         return false;
                     }
                     $page = $this->query['page'];
@@ -165,6 +164,8 @@ class ServiceAggregator {
                 // TODO: Broomley we service in Node.js
                 break;
         }
+
+        return false;
     }
 
     /**
@@ -172,7 +173,7 @@ class ServiceAggregator {
      * @param $name
      * @return string
      */
-    public function getServiceUrl($name) {
+    private function getServiceUrl($name) {
         $env = Env::getInstance();
 
         switch ($name) {
@@ -191,6 +192,8 @@ class ServiceAggregator {
                 // TODO: Broomley we service in Node.js
                 break;
         }
+
+        return false;
     }
 
     /**
