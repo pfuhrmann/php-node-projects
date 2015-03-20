@@ -12,7 +12,7 @@ use XSLTProcessor;
 class SearchPortalController extends BaseUIController {
 
     /**
-     * Search from services and return XML (Level 4)
+     * Search for services and return XML (Level 4)
      *  GET /search-xml  HTTP/1.1
      * @returns string
      */
@@ -31,7 +31,7 @@ class SearchPortalController extends BaseUIController {
     }
 
     /**
-     * Test graphical merged search results (Level 5)
+     * Display basic portal search form (Level 5)
      *  GET /search-display  HTTP/1.1
      * @returns string
      */
@@ -41,7 +41,7 @@ class SearchPortalController extends BaseUIController {
     }
 
     /**
-     * Test graphical merged search results (Level 5)
+     * Display basic portal results (Level 5)
      *  GET /search-display-results  HTTP/1.1
      * @returns string
      */
@@ -50,7 +50,7 @@ class SearchPortalController extends BaseUIController {
         // Get sitters
         $input = $_GET;
         $query = $this->parseRequestSitters($input);
-        $query['limit'] = '5'; // Hard setting limit to 5
+        $query['limit'] = '5'; // Hard setting limit
         $aggr = ServiceAggregator::createAggregator($query);
         $aggr->fetchResultsSitters();
         $sitters = XML2Array::createArray($aggr->getResults()->saveXML());
@@ -77,7 +77,7 @@ class SearchPortalController extends BaseUIController {
     }
 
     /**
-     * Test graphical merged search results (Level 5)
+     * Display sitter's details page (Level 5)
      *  GET /sitter-detail  HTTP/1.1
      * @returns string
      */
@@ -98,7 +98,7 @@ class SearchPortalController extends BaseUIController {
     }
 
     /**
-     * Test graphical merged search results (Level 5)
+     * Display portal search form using XSLT (Level 6)
      *  GET /search-display-xslt  HTTP/1.1
      * @returns string
      */
@@ -106,7 +106,7 @@ class SearchPortalController extends BaseUIController {
     {
         $input = $_GET;
         $query = $this->parseRequestSitters($input);
-        $query['limit'] = '5'; // Hard setting limit to 10
+        $query['limit'] = '5'; // Hard setting limit
         $aggr = ServiceAggregator::createAggregator($query);
         $aggr->fetchResultsSitters();
         $doc = $aggr->getResults();
@@ -117,6 +117,57 @@ class SearchPortalController extends BaseUIController {
         $xslt->importStylesheet($xsl);
 
         return $xslt->transformToXML($doc);
+    }
+
+    /**
+     * Display search form in Ajax-ed version of portal (Level 7)
+     *  GET /search-display-ajax  HTTP/1.1
+     * @returns string
+     */
+    public function getSearchDisplayAjax()
+    {
+        return $this->render('search/search-display-ajax.html', []);
+    }
+
+    /**
+     * Search for services and return JSON for datable (Level 7)
+     *  GET /search-json  HTTP/1.1
+     * @returns JSON
+     */
+    public function getSearchJson()
+    {
+        header('Content-Type: application/json');
+
+        $query = $this->parseRequestSitters($_REQUEST);
+        // Pagination settings
+        $query['limit'] = '5';
+        $query['page'] = ($_REQUEST['start'] / $query['limit']) + 1;
+
+        $aggr = ServiceAggregator::createAggregator($query);
+        if (!$aggr->fetchResultsSitters()) {
+            $error = $aggr->getErrorMessage();
+            return $this->createErrorDoc($error)->saveXML();
+        }
+
+        // Map XML to array
+        $sitters = XML2Array::createArray($aggr->getResults()->saveXML());
+        $sitters = $sitters['sitters']['sitter'];
+        $sittersArr['draw'] = $_REQUEST['draw'];
+        $sittersArr['recordsTotal'] = $aggr->getResultCount();
+        $sittersArr['recordsFiltered'] = $sittersArr['recordsTotal'];
+        $sittersArr['data'] = [];
+
+        $i = 0;
+        foreach ($sitters as $sitter) {
+            $sittersArr['data'][$i][] = $sitter['name']['firstname'] . " " . $sitter['name']['lastname'];
+            $sittersArr['data'][$i][] = $sitter['service']['type'];
+            $sittersArr['data'][$i][] = "&pound;" . $sitter['service']['charges'];
+            $sittersArr['data'][$i][] = $sitter['service']['location'];
+            $sittersArr['data'][$i][] = '<a href="index.php?uri=sitter-detail&#38;id='.$sitter['@attributes']['id'].'&#38;service='.$sitter['@attributes']['service'].'" title="View sitters details" class="btn btn-sm btn-info">Details</a>';
+            $i++;
+        }
+
+        return json_encode($sittersArr);
     }
 
     /**

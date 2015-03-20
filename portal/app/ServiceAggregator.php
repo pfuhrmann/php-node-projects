@@ -110,7 +110,7 @@ class ServiceAggregator {
                 // Page
                 $page = 1;
                 if (!empty($this->query['page'])) {
-                    if (!ctype_digit($this->query['page'])) {
+                    if (!ctype_digit((string)$this->query['page'])) {
                         $this->errorMessage = 'Page parameter must be positive whole number';
                         return false;
                     }

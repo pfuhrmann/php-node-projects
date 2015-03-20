@@ -1,0 +1,98 @@
+{% extends "base.html.twig" %}
+
+{% block content %}
+    <div class="row clearfix">
+        <div class="col-md-10 column">
+            <p>Click <strong><a href="./index.php">here</a></strong> for a list of levels completed.</p>
+
+            <h1>Search Sitters</h1>
+
+            <div class="jumbotron">
+                <p class="push-top">Please select search filters</p>
+
+                <form class="form-inline">
+                    {# Search by sitter type #}
+                    <div class="row push-top">
+                        <div class="form-group">
+                            <label for="type" class="col-sm-5 control-label push-bottom">Sitter Type</label>
+                            <div class="col-sm-5 push-bottom">
+                                <input type="text" class="form-control" id="type" name="type" value="{{ input.type }}" size="14" placeholder="grannysitter" />
+                            </div>
+                        </div>
+                    </div>
+
+                    {# Search by postcode #}
+                    <div class="row">
+                        <div class="form-group">
+                            <label for="sort" class="col-sm-5 control-label push-bottom">Sort By</label>
+                            <div class="col-sm-5 push-bottom">
+                                <select class="form-control" name="sort" id="sort">
+                                    <option value="priceasc">Price: Low to High</option>
+                                    <option value="pricedesc">Price: High to Low</option>
+                                    <option value="location">Location: A to Z</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-sm-2 push-bottom">
+                            <button type="submit" class="btn btn-primary">Search Now</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-10">
+            <table class="table" id="results">
+                <thead>
+                <tr>
+                    <th id="name">Name</th>
+                    <th id="type">Type</th>
+                    <th id="charges">Charges (p/h)</th>
+                    <th id="location">Location</th>
+                    <th id="details">Details</th>
+                </tr>
+            </table>
+        </div>
+    </div>
+{% endblock %}
+
+{% block js %}
+    <script type="text/javascript" src="assets/datatables/media/js/jquery.dataTables.js"></script>
+    <script type="text/javascript" language="javascript" src="//cdn.datatables.net/plug-ins/f2c75b7247b/integration/bootstrap/3/dataTables.bootstrap.js"></script>
+    <script type="text/javascript">
+        $(function() {
+            var resultsTbl = $("#results");
+
+            // Hide results for now
+            resultsTbl.hide();
+
+            // Handle form click
+            $("form").submit(function(event) {
+                event.preventDefault();
+
+                var formData = $(this).serialize();
+                // Display data table
+                resultsTbl.DataTable({
+                    bFilter: false, bInfo: false, bLengthChange: false, destroy: true,
+                    processing: true,
+                    serverSide: true,
+                    language: {
+                        emptyTable: "No results found, please try different search filters."
+                    },
+                    pageLength: 5,
+                    ajax: {
+                        url: "index.php?uri=search-json&" + formData
+                    }
+                });
+
+                // Show datatable
+                resultsTbl.show();
+            });
+        });
+    </script>
+{% endblock %}
