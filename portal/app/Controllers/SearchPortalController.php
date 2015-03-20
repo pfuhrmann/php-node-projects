@@ -50,7 +50,7 @@ class SearchPortalController extends BaseUIController {
         // Get sitters
         $input = $_GET;
         $query = $this->parseRequestSitters($input);
-        $query['limit'] = '5'; // Hard setting limit to 10
+        $query['limit'] = '5'; // Hard setting limit to 5
         $aggr = ServiceAggregator::createAggregator($query);
         $aggr->fetchResultsSitters();
         $sitters = XML2Array::createArray($aggr->getResults()->saveXML());
@@ -110,8 +110,6 @@ class SearchPortalController extends BaseUIController {
         $aggr = ServiceAggregator::createAggregator($query);
         $aggr->fetchResultsSitters();
         $doc = $aggr->getResults();
-        //$doc = new DOMDocument();
-        //$doc->load('goodBooks.xml',LIBXML_NOBLANKS);
 
         $xslt = new XSLTProcessor();
         $xsl = new DOMDocument();
