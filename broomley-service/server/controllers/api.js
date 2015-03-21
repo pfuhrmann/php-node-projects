@@ -54,9 +54,12 @@ exports.sitterDetails = function(req, res) {
     var root = builder.create('sitter_detail');
 
     // Validate param
-    if (req.query.id === null) {
+    if (req.query.id === null || req.query.id === '') {
+        console.log('here');
         var error = 'ID parameter is required';
         root.ele('error_message', error);
+        root = root.end();
+        res.send(root);
     }
 
     // Query for service by specified ID
