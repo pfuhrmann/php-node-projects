@@ -8,7 +8,7 @@
         <div class="jumbotron">
             <div class="row ">
                 <h2>Search Results</h2>
-                <a href="index.php?uri=search-display" class="btn btn-primary">Back To Search</a>
+                <a href="index.php?uri={{ uri_search }}" class="btn btn-primary">Back To Search</a>
             </div>
 
             <div class="row push-bottom">
@@ -28,7 +28,7 @@
                     {% if currentPage == key %}
                         {{ key }}
                     {% else %}
-                        <a href="index.php?uri=search-display-results&#38;type={{ input.type }}&#38;sort={{ input.sort }}&#38;page={{ key }}">{{ key }}</a>
+                        <a href="index.php?uri={{ uri_results }}&#38;type={{ input.type }}&#38;sort={{ input.sort }}&#38;page={{ key }}">{{ key }}</a>
                     {% endif %}
                     {% if not loop.last %},{% endif %}
                 {% endfor %}
@@ -51,7 +51,7 @@
                             <td headers="charges" class="center">&pound;{{ sitter.service.charges }}</td>
                             <td headers="location" class="center">{{ sitter.service.location }}</td>
                             <td headers="details" class="center">
-                                <a href="index.php?uri=sitter-detail&#38;id={{ attribute(sitter, '@attributes').id }}&#38;service={{ attribute(sitter, '@attributes').service }}" title="View sitters details" class="btn btn-sm btn-info">Details</a>
+                                <a href="index.php?uri={{ uri_detail }}&#38;id={{ attribute(sitter, '@attributes').id }}&#38;service={{ attribute(sitter, '@attributes').service }}" title="View sitters details" class="btn btn-sm btn-info">Details</a>
                             </td>
                         </tr>
                     {% endfor %}
@@ -66,7 +66,7 @@
                     {% if currentPage == key %}
                         {{ key }}
                     {% else %}
-                        <a href="index.php?uri=search-display-results&#38;type={{ input.type }}&#38;sort={{ input.sort }}&#38;page={{ key }}">{{ key }}</a>
+                        <a href="index.php?uri={{ uri_results }}&#38;type={{ input.type }}&#38;sort={{ input.sort }}&#38;page={{ key }}">{{ key }}</a>
                     {% endif %}
                     {% if not loop.last %},{% endif %}
                 {% endfor %}

@@ -52,10 +52,11 @@ class ServiceAggregator {
 
     /**
      * Fetch services for sitters list
-     * @return bool True if fetch successful
+     * @param bool $fetchBromley Node.js service will be used in fetch process
+     * @return bool True if fetch was successful
      * @throws \Exception
      */
-    public function fetchResultsSitters()
+    public function fetchResultsSitters($fetchBromley = false)
     {
         // Get results from .NET service (Lewisham)
         $client = new SoapClient($this->getServiceUrl('lewisham'));
@@ -68,11 +69,27 @@ class ServiceAggregator {
         $xmlDom2 = new DOMDocument();
         $xmlDom2->load($url);
 
-        // Merge results together
-        $xmlRoot1 = $xmlDom1->documentElement;
+        // Merge Lewisham + Greenwich
+        $this->mergeDom($xmlDom1, $xmlDom2);
+        /*$xmlRoot1 = $xmlDom1->documentElement;
         foreach ($xmlDom2->documentElement->childNodes as $node2) {
             $node1 = $xmlDom1->importNode($node2, true);
             $xmlRoot1->appendChild($node1);
+        }*/
+
+        if ($fetchBromley) {
+            // Merge Broomley with rest
+            $url = $this->getServiceUrl('bromley').'/sitters?type='.$this->query['type'].'';
+            $xmlDom3 = new DOMDocument();
+            $xmlDom3->load($url);
+
+            // Merge results together
+            $this->mergeDom($xmlDom1, $xmlDom3);
+            /*$xmlRoot1 = $xmlDom1->documentElement;
+            foreach ($xmlDom2->documentElement->childNodes as $node2) {
+                $node1 = $xmlDom1->importNode($node2, true);
+                $xmlRoot1->appendChild($node1);
+            }*/
         }
 
         // Convert xml to array
@@ -145,7 +162,7 @@ class ServiceAggregator {
         switch ($this->query['service']) {
             case 'lewisham':
                 // Get results from .NET service (Lewisham)
-                $client = new SoapClient($this->getServiceUrl('lewisham'));
+                $client = new SoapClient(self::getServiceUrl('lewisham'));
                 $xmls = $client->sitterDetails(['id' => $this->query['id']])->SitterDetailsResult->any;
                 $xmlDom = new DOMDocument();
                 $xmlDom->loadXML($xmls, LIBXML_NOBLANKS);
@@ -154,14 +171,18 @@ class ServiceAggregator {
                 return true;
             case 'greenwich':
                 // Get results from PHP service (Greenwich)
-                $url = $this->getServiceUrl('greenwich').'/index.php?uri=sitter-detail&id='.$this->query['id'].'';
+                $url = self::getServiceUrl('greenwich').'/index.php?uri=sitter-detail&id='.$this->query['id'];
                 $xmlDom = new DOMDocument();
                 $xmlDom->load($url);
                 $this->results = $xmlDom;
 
                 return true;
-            case 'broomley':
-                // TODO: Broomley we service in Node.js
+            case 'bromley':
+                // Get results from Node.js service (Bromley)
+                $url = self::getServiceUrl('bromley').'/sitter-details?id='.$this->query['id'];
+                $xmlDom = new DOMDocument();
+                $xmlDom->load($url);
+                $this->results = $xmlDom;
                 break;
         }
 
@@ -173,7 +194,7 @@ class ServiceAggregator {
      * @param $name
      * @return string
      */
-    private function getServiceUrl($name) {
+    public static function getServiceUrl($name) {
         $env = Env::getInstance();
 
         switch ($name) {
@@ -188,8 +209,8 @@ class ServiceAggregator {
                 $url = 'http://'.$serverName;
 
                 return $url;
-            case 'broomley':
-                // TODO: Broomley we service in Node.js
+            case 'bromley':
+                return ($env->isDev()) ? 'http://192.168.1.64:61339' : '';
                 break;
         }
 
@@ -239,6 +260,19 @@ class ServiceAggregator {
         }
 
         return ($sitterA['service']['location'] < $sitterB['service']['location']) ? -1 : 1;
+    }
+
+    /**
+     * Merge two DOM's together
+     * @param DOMDocument $xmlDomA
+     * @param DOMDocument $xmlDomB
+     */
+    private function mergeDom(DOMDocument $xmlDomA, DOMDocument $xmlDomB) {
+        $xmlRoot1 = $xmlDomA->documentElement;
+        foreach ($xmlDomB->documentElement->childNodes as $node2) {
+            $node1 = $xmlDomA->importNode($node2, true);
+            $xmlRoot1->appendChild($node1);
+        }
     }
 
     /**

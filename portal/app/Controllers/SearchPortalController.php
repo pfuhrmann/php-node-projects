@@ -18,16 +18,17 @@ class SearchPortalController extends BaseUIController {
      */
     public function anySearchXml()
     {
-        header('Content-type: text/xml');
+        return $this->fetchSittersXml();
+    }
 
-        $query = $this->parseRequestSitters($_REQUEST);
-        $aggr = ServiceAggregator::createAggregator($query);
-        if (!$aggr->fetchResultsSitters()) {
-            $error = $aggr->getErrorMessage();
-            return $this->createErrorDoc($error)->saveXML();
-        }
-
-        return $aggr->getResults()->saveXML();
+    /**
+     * Search for services and return XML (Level 8)
+     *  GET /search-xml-bromley  HTTP/1.1
+     * @returns string
+     */
+    public function anySearchXmlBromley()
+    {
+        return $this->fetchSittersXml(true);
     }
 
     /**
@@ -37,7 +38,21 @@ class SearchPortalController extends BaseUIController {
      */
     public function getSearchDisplay()
     {
-        return $this->render('search/search-display.html', []);
+        return $this->render('search/search-display.html', [
+            'form_uri' => 'search-display-results'
+        ]);
+    }
+
+    /**
+     * Display basic portal search form (Level 8)
+     *  GET /search-display-bromley  HTTP/1.1
+     * @returns string
+     */
+    public function getSearchDisplayBromley()
+    {
+        return $this->render('search/search-display.html', [
+            'form_uri' => 'search-display-results-bromley'
+        ]);
     }
 
     /**
@@ -47,33 +62,17 @@ class SearchPortalController extends BaseUIController {
      */
     public function getSearchDisplayResults()
     {
-        // Get sitters
-        $input = $_GET;
-        $query = $this->parseRequestSitters($input);
-        $query['limit'] = '5'; // Hard setting limit
-        $aggr = ServiceAggregator::createAggregator($query);
-        $aggr->fetchResultsSitters();
-        $sitters = XML2Array::createArray($aggr->getResults()->saveXML());
-        $sitters = !empty($sitters['sitters']) ? $sitters['sitters']['sitter'] : [];
+        return $this->fetchSitters();
+    }
 
-        // We have only 1 result
-        if (isset($sitters['name'])) {
-            $sittersA[] = $sitters;
-            $sitters = $sittersA;
-        }
-
-        // Generate pagination
-        if (!ctype_digit($query['page'])) {
-            $query['page'] = '1';
-        }
-        $pagination = new Pagination($aggr->getResultCount(), $query['page'], $query['limit']);
-
-        return $this->render('search/search-display-results.html', [
-            'input' => $input,
-            'sitters' => $sitters,
-            'pages' => $pagination->build(),
-            'currentPage' => $query['page'],
-        ]);
+    /**
+     * Display basic portal results (Level 8)
+     *  GET /search-display-results-bromley  HTTP/1.1
+     * @returns string
+     */
+    public function getSearchDisplayResultsBromley()
+    {
+        return $this->fetchSitters(true);
     }
 
     /**
@@ -126,7 +125,21 @@ class SearchPortalController extends BaseUIController {
      */
     public function getSearchDisplayAjax()
     {
-        return $this->render('search/search-display-ajax.html', []);
+        return $this->render('search/search-display-ajax.html', [
+            'uri' => 'search-json'
+        ]);
+    }
+
+    /**
+     * Display search form in Ajax-ed version of portal (Level 8)
+     *  GET /search-display-ajax-bromley  HTTP/1.1
+     * @returns string
+     */
+    public function getSearchDisplayAjaxBromley()
+    {
+        return $this->render('search/search-display-ajax.html', [
+            'uri' => 'search-json-bromley'
+        ]);
     }
 
     /**
@@ -136,6 +149,83 @@ class SearchPortalController extends BaseUIController {
      */
     public function getSearchJson()
     {
+        return $this->fetchSittersJson();
+    }
+
+    /**
+     * Search for services and return JSON for datable (Level 8)
+     *  GET /search-json-bromley  HTTP/1.1
+     * @returns json
+     */
+    public function getSearchJsonBromley()
+    {
+        return $this->fetchSittersJson(true);
+    }
+
+    /**
+     * @param bool $fetchBromley
+     * @return string
+     * @throws \Exception
+     */
+    private function fetchSitters($fetchBromley = false)
+    {
+        // Get sitters
+        $input = $_GET;
+        $query = $this->parseRequestSitters($input);
+        $query['limit'] = '5'; // Hard setting limit
+        $aggr = ServiceAggregator::createAggregator($query);
+        $aggr->fetchResultsSitters($fetchBromley);
+        $sitters = XML2Array::createArray($aggr->getResults()->saveXML());
+        $sitters = !empty($sitters['sitters']) ? $sitters['sitters']['sitter'] : [];
+
+        // We have only 1 result
+        if (isset($sitters['name'])) {
+            $sittersA[] = $sitters;
+            $sitters = $sittersA;
+        }
+
+        // Generate pagination
+        if (!ctype_digit($query['page'])) {
+            $query['page'] = '1';
+        }
+        $pagination = new Pagination($aggr->getResultCount(), $query['page'], $query['limit']);
+
+        return $this->render('search/search-display-results.html', [
+            'input' => $input,
+            'sitters' => $sitters,
+            'pages' => $pagination->build(),
+            'currentPage' => $query['page'],
+            'uri_search' => (!$fetchBromley) ? 'search-display' : 'search-display-bromley',
+            'uri_detail' => 'sitter-detail',
+            'uri_results' => (!$fetchBromley) ? 'search-display-results' : 'search-display-results-bromley',
+        ]);
+    }
+
+    /**
+     * @param bool $fetchBromley
+     * @return string
+     */
+    private function fetchSittersXml($fetchBromley = false)
+    {
+        header('Content-type: text/xml');
+
+        $query = $this->parseRequestSitters($_REQUEST);
+        $aggr = ServiceAggregator::createAggregator($query);
+        if (!$aggr->fetchResultsSitters($fetchBromley)) {
+            $error = $aggr->getErrorMessage();
+            return $this->createErrorDoc($error)->saveXML();
+        }
+
+        return $aggr->getResults()->saveXML();
+    }
+
+    /**
+     * @param bool $fetchBromley
+     * @return string
+     * @throws \Exception
+     */
+    private function fetchSittersJson($fetchBromley = false)
+    {
         header('Content-Type: application/json');
 
         $query = $this->parseRequestSitters($_REQUEST);
@@ -144,7 +234,7 @@ class SearchPortalController extends BaseUIController {
         $query['page'] = ($_REQUEST['start'] / $query['limit']) + 1;
 
         $aggr = ServiceAggregator::createAggregator($query);
-        if (!$aggr->fetchResultsSitters()) {
+        if (!$aggr->fetchResultsSitters($fetchBromley)) {
             $error = $aggr->getErrorMessage();
             return $this->createErrorDoc($error)->saveXML();
         }

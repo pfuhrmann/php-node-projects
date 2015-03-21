@@ -1,0 +1,33 @@
+{% extends "base.html.twig" %}
+
+{% block content %}
+<div class="row clearfix">
+    <div class="col-md-10 column">
+        <p>Click <strong><a href="../">here</a></strong> for a complete list of operations.</p>
+
+        <h1>Bromley Sitters (Level 8)</h1>
+
+        <p>To test the operation using the HTTP GET protocol, click the 'Invoke' button.</p>
+        <form method="GET" action="http://192.168.1.64:61339/sitters" target="_blank">
+            <table class="table">
+                <thead>
+                <tr>
+                    <td><strong>Parameter</strong></td>
+                    <td><strong>Value</strong></td>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>Type:</td>
+                    <td><input name="type" type="text" size="40" class="form-control" /></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td><input type="submit" value="Invoke" class="btn btn-primary" /></td>
+                </tr>
+                </tbody>
+            </table>
+        </form>
+    </div>
+</div>
+{% endblock %}
