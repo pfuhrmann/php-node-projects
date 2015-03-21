@@ -17,7 +17,7 @@ var api = require('./server/controllers/api');
 var pop = require('./server/controllers/populate');
 // Routes
 app.get('/sitters', api.sitters);
-app.get('/sitters-details', api.sitterDetails);
+app.get('/sitter-details', api.sitterDetails);
 app.get('/populate', pop.populate);
 
 // Start server

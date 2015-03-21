@@ -12,4 +12,4 @@ var sitterSchema = new Schema({
     phone: String
 });
 
-module.exports = mongoose.model('Sitter', sitterSchema);
+module.exports = mongoose.model('sitterSchema', sitterSchema);

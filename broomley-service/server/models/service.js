@@ -4,8 +4,8 @@ var mongoose = require('mongoose'),
     Schema = mongoose.Schema,
     ObjectId = Schema.ObjectId;
 
-var Images = mongoose.model('Image').schema;
-var Sitter = mongoose.model('Sitter').schema;
+var imageSchema = mongoose.model('ImageM').schema;
+var sitterSchema = mongoose.model('sitterSchema').schema;
 
 var serviceSchema = new Schema({
     id: ObjectId,
@@ -14,8 +14,8 @@ var serviceSchema = new Schema({
     availability: String,
     description: String,
     charges: Number,
-    images: [Images],
-    sitter: [Sitter]
+    images: [imageSchema],
+    sitter: [sitterSchema]
 });
 
 module.exports = mongoose.model('Service', serviceSchema);
