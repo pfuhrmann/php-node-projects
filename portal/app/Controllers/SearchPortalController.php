@@ -132,7 +132,7 @@ class SearchPortalController extends BaseUIController {
     /**
      * Search for services and return JSON for datable (Level 7)
      *  GET /search-json  HTTP/1.1
-     * @returns JSON
+     * @returns json
      */
     public function getSearchJson()
     {
