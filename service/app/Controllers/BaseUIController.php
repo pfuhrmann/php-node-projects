@@ -4,7 +4,7 @@ namespace COMP1688\CW\Controllers;
 
 use Twig_Environment;
 
-class BaseUIController {
+abstract class BaseUIController {
 
     /**
      * @var Twig_Environment

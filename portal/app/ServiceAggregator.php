@@ -210,7 +210,7 @@ class ServiceAggregator {
 
                 return $url;
             case 'bromley':
-                return ($env->isDev()) ? 'http://192.168.1.64:61339' : '';
+                return ($env->isDev()) ? 'http://192.168.1.64:5000' : '';
                 break;
         }
 

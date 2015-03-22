@@ -32,7 +32,7 @@ class SearchPortalController extends BaseUIController {
     }
 
     /**
-     * Display basic portal search form (Level 5)
+     * Display basic portal search form (Level 6)
      *  GET /search-display  HTTP/1.1
      * @returns string
      */
@@ -40,6 +40,30 @@ class SearchPortalController extends BaseUIController {
     {
         return $this->render('search/search-display.html', [
             'form_uri' => 'search-display-results'
+        ]);
+    }
+
+    /**
+     * Display basic portal search form (Level 6)
+     *  GET /search-display-xslt  HTTP/1.1
+     * @returns string
+     */
+    public function getSearchDisplayXslt()
+    {
+        return $this->render('search/search-display.html', [
+            'form_uri' => 'search-display-results-xslt'
+        ]);
+    }
+
+    /**
+     * Display basic portal search form (Level 8)
+     *  GET /search-display-xslt-bromley  HTTP/1.1
+     * @returns string
+     */
+    public function getSearchDisplayXsltBromley()
+    {
+        return $this->render('search/search-display.html', [
+            'form_uri' => 'search-display-results-xslt-bromley'
         ]);
     }
 
@@ -63,6 +87,26 @@ class SearchPortalController extends BaseUIController {
     public function getSearchDisplayResults()
     {
         return $this->fetchSitters();
+    }
+
+    /**
+     * Display basic portal results using XSLT (Level 6)
+     *  GET /search-display-xslt  HTTP/1.1
+     * @returns string
+     */
+    public function getSearchDisplayResultsXslt()
+    {
+        return $this->getResultsXslt();
+    }
+
+    /**
+     * Display basic portal results using XSLT (Level 8)
+     *  GET /search-display-xslt-bromley  HTTP/1.1
+     * @returns string
+     */
+    public function getSearchDisplayResultsXsltBromley()
+    {
+        return $this->getResultsXslt(true);
     }
 
     /**
@@ -97,22 +141,22 @@ class SearchPortalController extends BaseUIController {
     }
 
     /**
-     * Display portal search form using XSLT (Level 6)
-     *  GET /search-display-xslt  HTTP/1.1
+     * Display sitter's details page using XSLT (Level 6)
+     *  GET /sitter-detail-xslt  HTTP/1.1
      * @returns string
      */
-    public function getSearchDisplayXslt()
+    public function getSitterDetailXslt()
     {
+        // Get sitters
         $input = $_GET;
-        $query = $this->parseRequestSitters($input);
-        $query['limit'] = '5'; // Hard setting limit
+        $query = $this->parseRequestSitterDetail($input);
         $aggr = ServiceAggregator::createAggregator($query);
-        $aggr->fetchResultsSitters();
+        $aggr->fetchResultsSitterDetails();
         $doc = $aggr->getResults();
 
         $xslt = new XSLTProcessor();
         $xsl = new DOMDocument();
-        $xsl->load('sitters.xsl', LIBXML_NOCDATA);
+        $xsl->load('sitter_detail.xsl', LIBXML_NOCDATA);
         $xslt->importStylesheet($xsl);
 
         return $xslt->transformToXML($doc);
@@ -218,6 +262,23 @@ class SearchPortalController extends BaseUIController {
 
         return $aggr->getResults()->saveXML();
     }
+
+    private function getResultsXslt($fetchBromley = false)
+    {
+        $input = $_GET;
+        $query = $this->parseRequestSitters($input);
+        $aggr = ServiceAggregator::createAggregator($query);
+        $aggr->fetchResultsSitters($fetchBromley);
+        $doc = $aggr->getResults();
+
+        $xslt = new XSLTProcessor();
+        $xsl = new DOMDocument();
+        $xsl->load('sitters.xsl', LIBXML_NOCDATA);
+        $xslt->importStylesheet($xsl);
+
+        return $xslt->transformToXML($doc);
+    }
+
 
     /**
      * @param bool $fetchBromley
