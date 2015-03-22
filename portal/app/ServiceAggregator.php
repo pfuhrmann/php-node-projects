@@ -210,7 +210,7 @@ class ServiceAggregator {
 
                 return $url;
             case 'bromley':
-                return ($env->isDev()) ? 'http://192.168.1.64:5000' : '';
+                return ($env->isDev()) ? 'http://192.168.1.64:5000' : 'https://comp1688.herokuapp.com';
                 break;
         }
 
