@@ -7,13 +7,17 @@ var mongoose = require('mongoose'),
 var imageSchema = mongoose.model('ImageM').schema;
 var sitterSchema = mongoose.model('sitterSchema').schema;
 
+function toMonetary(v) {
+    return v.toFixed(2);
+}
+
 var serviceSchema = new Schema({
     id: ObjectId,
     type: String,
     location: String,
     availability: String,
     description: String,
-    charges: Number,
+    charges: {type: Number, get: toMonetary},
     images: [imageSchema],
     sitter: [sitterSchema]
 });

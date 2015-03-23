@@ -55,7 +55,6 @@ exports.sitterDetails = function(req, res) {
 
     // Validate param
     if (req.query.id === null || req.query.id === '') {
-        console.log('here');
         var error = 'ID parameter is required';
         root.ele('error_message', error);
         root = root.end();
@@ -64,31 +63,42 @@ exports.sitterDetails = function(req, res) {
 
     // Query for service by specified ID
     Service.findById(req.query.id, function(err, doc) {
-        // Map result to XML
-        root.att('id', doc._id);
-        // Name
-        var nameEl = root.ele('name');
-        nameEl.ele('firstname', doc.sitter[0].first_name);
-        nameEl.ele('lastname', doc.sitter[0].last_name);
-        // Contact
-        root.ele('email', doc.sitter[0].email);
-        root.ele('phone', doc.sitter[0].phone);
-        // Service
-        var serviceEl = root.ele('service');
-        serviceEl.ele('type', doc.type);
-        serviceEl.ele('location', doc.location);
-        serviceEl.ele('availability', doc.availability);
-        serviceEl.ele('description', doc.description);
-        serviceEl.ele('charges', doc.charges);
-        // Images
-        var imgsEl = serviceEl.ele('images');
-        for (var i = 0; i < doc.images.length; i++) {
-            var image = doc.images[i];
-            var imgEl = imgsEl.ele('image');
-            imgEl.ele('image_url', image.code);
+        if (err) {
+            console.log(err);
         }
 
-        root = root.end({ pretty: true});
-        res.send(root);
+        if (!doc) {
+            var error = 'Service with given ID was not found';
+            root.ele('error_message', error);
+            root = root.end();
+            res.send(root);
+        } else {
+            // Map result to XML
+            root.att('id', doc._id);
+            // Name
+            var nameEl = root.ele('name');
+            nameEl.ele('firstname', doc.sitter[0].first_name);
+            nameEl.ele('lastname', doc.sitter[0].last_name);
+            // Contact
+            root.ele('email', doc.sitter[0].email);
+            root.ele('phone', doc.sitter[0].phone);
+            // Service
+            var serviceEl = root.ele('service');
+            serviceEl.ele('type', doc.type);
+            serviceEl.ele('location', doc.location);
+            serviceEl.ele('availability', doc.availability);
+            serviceEl.ele('description', doc.description);
+            serviceEl.ele('charges', doc.charges);
+            // Images
+            var imgsEl = serviceEl.ele('images');
+            for (var i = 0; i < doc.images.length; i++) {
+                var image = doc.images[i];
+                var imgEl = imgsEl.ele('image');
+                imgEl.ele('image_url', image.code);
+            }
+
+            root = root.end({ pretty: true});
+            res.send(root);
+        }
     });
 };

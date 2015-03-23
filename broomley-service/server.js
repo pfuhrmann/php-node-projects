@@ -22,7 +22,8 @@ app.get('/sitters', api.sitters);
 app.get('/sitter-details', api.sitterDetails);
 app.get('/populate', pop.populate);
 
+app.set('port', (process.env.PORT || 5000));
 // Start server
-var server = app.listen(61339, function() {
+var server = app.listen(app.get('port'), function() {
     console.log('Listening on port %d', server.address().port);
 });
