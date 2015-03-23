@@ -47,7 +47,9 @@ class TestController extends BaseUIController {
      */
     public function getTestBromleySitters()
     {
-        return $this->render('tests/sitters-bromley.html', []);
+        return $this->render('tests/sitters-bromley.html', [
+            'uri' => ServiceAggregator::getServiceUrl('bromley').'/sitters'
+        ]);
     }
 
     /**
@@ -57,6 +59,8 @@ class TestController extends BaseUIController {
      */
     public function getTestBromleySitterDetails()
     {
-        return $this->render('tests/sitter-details.html', []);
+        return $this->render('tests/sitter-details-bromley.html', [
+            'uri' => ServiceAggregator::getServiceUrl('bromley').'/sitter-details'
+        ]);
     }
 }

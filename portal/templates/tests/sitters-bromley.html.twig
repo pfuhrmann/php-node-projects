@@ -3,12 +3,12 @@
 {% block content %}
 <div class="row clearfix">
     <div class="col-md-10 column">
-        <p>Click <strong><a href="../">here</a></strong> for a complete list of operations.</p>
+        <p>Click <strong><a href="./index.php">here</a></strong> for a complete list of operations.</p>
 
         <h1>Bromley Sitters (Level 8)</h1>
 
         <p>To test the operation using the HTTP GET protocol, click the 'Invoke' button.</p>
-        <form method="GET" action="http://192.168.1.64:61339/sitters" target="_blank">
+        <form method="GET" action="{{ uri }}" target="_blank">
             <table class="table">
                 <thead>
                 <tr>
