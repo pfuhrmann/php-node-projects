@@ -11,17 +11,49 @@ var mongoose = require('mongoose'),
 */
 exports.sitters = function(req, res) {
     res.setHeader('Content-Type', 'text/xml');
+    var root = builder.create('sitters');
+
+    function isNumber(n) {
+        return !isNaN(parseFloat(n)) && isFinite(n);
+    }
 
     // Type filtering
-    var query;
-    if (req.query.type !== null) {
-        query = {type: new RegExp(req.query.type, 'i')};
+    var whereQuery;
+    if (req.query.type !== undefined && req.query.type != '') {
+        whereQuery = {type: new RegExp(req.query.type, 'i')};
+    }
+
+    var query = Service.find(whereQuery);
+    // Pagination
+    if (req.query.limit !== undefined && req.query.limit != '') {
+        var limit = req.query.limit;
+        var error = '';
+
+        if (!isNumber(limit)) {
+            error = 'Limit parameter must be numeric';
+            root.ele('error_message', error);
+            root = root.end();
+            res.send(root);
+        }
+
+        var page = 1;
+        if (req.query.page !== undefined  && req.query.page != '') {
+            page = req.query.page;
+            if (!isNumber(page)) {
+                error = 'Page parameter must be numeric';
+                root.ele('error_message', error);
+                root = root.end();
+                res.send(root);
+            }
+        }
+
+        query = query.skip((page - 1) * limit).limit(limit);
     }
 
     // Query for services
-    Service.find(query, function (err, docs) {
+    query.exec(function (err, docs) {
         // Map results to XML
-        var root = builder.create('sitters');
+
         for (var i = 0; i < docs.length; i++) {
             var service = docs[i];
             // Sitter
