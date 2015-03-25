@@ -44,13 +44,37 @@ class ServicesController
             $params = [];
             $query = 'SELECT se.id, se.type, se.charges, se.location, si.first_name, si.first_name, si.last_name
                       FROM service se
-                      INNER JOIN sitter si ON si.id = se.sitter_id';
+                      INNER JOIN sitter si ON si.id = se.sitter_id ';
             if (!empty($_REQUEST['type'])) {
                 // Get sitter accounts by type
                 $sitterType = $_REQUEST['type'];
-                $query .= ' WHERE se.type LIKE ?';
+                $query .= ' WHERE se.type LIKE ? ';
                 $params[] = '%'.$sitterType.'%';
             }
+
+            if (!empty($_REQUEST['limit'])) {
+
+                $limit = $_REQUEST['limit'];
+                if (!is_numeric($limit)) {
+                    $xmlError = $xmlDom->createElement('error_message', 'Limit parameter must be numeric value');
+                    $xmlRoot->appendChild($xmlError);
+                    return $xmlDom->saveXML();
+                }
+
+                $page = 1;
+                if (!empty($_REQUEST['page'])) {
+                    if (!is_numeric($limit)) {
+                        $xmlError = $xmlDom->createElement('error_message', 'Page parameter must be numeric value');
+                        $xmlRoot->appendChild($xmlError);
+                        return $xmlDom->saveXML();
+                    }
+                    $page = $_REQUEST['page'];
+                }
+
+                $query .= ' LIMIT '.(($page - 1) * $limit).', '.$limit;
+            }
+
+
 
             $stmtSe = $this->db->prepare($query);
             $stmtSe->execute($params);
