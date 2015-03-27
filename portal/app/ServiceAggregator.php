@@ -71,11 +71,6 @@ class ServiceAggregator {
 
         // Merge Lewisham + Greenwich
         $this->mergeDom($xmlDom1, $xmlDom2);
-        /*$xmlRoot1 = $xmlDom1->documentElement;
-        foreach ($xmlDom2->documentElement->childNodes as $node2) {
-            $node1 = $xmlDom1->importNode($node2, true);
-            $xmlRoot1->appendChild($node1);
-        }*/
 
         if ($fetchBromley) {
             // Merge Broomley with rest
@@ -85,11 +80,6 @@ class ServiceAggregator {
 
             // Merge results together
             $this->mergeDom($xmlDom1, $xmlDom3);
-            /*$xmlRoot1 = $xmlDom1->documentElement;
-            foreach ($xmlDom2->documentElement->childNodes as $node2) {
-                $node1 = $xmlDom1->importNode($node2, true);
-                $xmlRoot1->appendChild($node1);
-            }*/
         }
 
         // Convert xml to array
