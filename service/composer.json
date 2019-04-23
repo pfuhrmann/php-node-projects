@@ -9,7 +9,6 @@
     "authors": [
         {
             "name": "Patrik Fuhrmann",
-            "email": "fuhrmann.patrik@gmail.com"
         }
     ],
     "autoload": {
