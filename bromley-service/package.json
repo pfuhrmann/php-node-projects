@@ -3,7 +3,6 @@
   "description": "COMP1688",
   "version": "0.0.1",
   "private": true,
-  "author": "Patrik Fuhrmann <fuhrmann.patrik@gmail.com>",
   "engines": {
     "node": "0.10.x",
     "npm": "1.4.x"
